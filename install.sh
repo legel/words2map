@@ -49,7 +49,7 @@ add_miniconda_to_path() {
 		STARTUP_FILE="$HOME/.zshrc"
 		update_script_startup_file
 	else
-		echo "Couldn't automatically add Miniconda to your PATH... you can type \"export PATH=\$PATH:\$HOME/miniconda/bin\" into your terminal and execute that, if you wish to add new Miniconda libraries" 
+		echo "Couldn't automatically add Miniconda to the PATH of your preferred terminal. We suggest working from Bash or ZShell." 
 	fi
 }
 
@@ -71,6 +71,10 @@ install_conda_if_needed() {
 install_python_dependencies() {
 	if hash conda 2>/dev/null; then
     	echo 'Installing Python dependencies for words2map...'
+		CONDA_ENVIRONMENTS="$(conda env list)"
+		if [[ "$CONDA_ENVIRONMENTS" != *"words2map"* ]]; then
+			conda create --name words2map --yes --channel chuongdo google-api-python-client gensim seaborn scikit-learn mongodb 
+		fi
 	fi	
 }
 
