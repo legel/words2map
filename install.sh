@@ -78,6 +78,7 @@ create_conda_environment() {
 }
 
 install_developer_libraries_as_needed() {
+	OS_ARCHITECTURE="$(uname -s)"
 	if [ $OS_ARCHITECTURE == "Linux" ]; then
 		echo "$(python -mplatform | grep -qi Ubuntu && sudo apt-get update || sudo yum update -y && sudo yum install libffi-devel)"
 	fi
@@ -90,7 +91,7 @@ install_python_dependencies() {
 		conda install --channel spacy --yes spacy cython scikit-learn gensim seaborn mongodb
 		install_developer_libraries_as_needed
 		pip install hdbscan pattern textacy
-		echo "Downloading English language model from Spacy.io for keyterm extraction via the SGRank algorithm in Textacy:"
+		echo "Downloading English language model from Spacy.io for keyterm extraction in Textacy:"
 		python -m spacy.en.download
 	fi	
 }
