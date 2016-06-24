@@ -68,18 +68,31 @@ install_conda_if_needed() {
 	fi
 }
 
-install_python_dependencies() {
+create_conda_environment() {
 	if hash conda 2>/dev/null; then
 		CONDA_ENVIRONMENTS="$(conda env list)"
 		if [[ "$CONDA_ENVIRONMENTS" != *"words2map"* ]]; then
-    		echo 'Installing Python dependencies for words2map...'
-			conda create --name words2map --channel spacy --yes spacy cython scikit-learn gensim scrapy seaborn mongodb
-			source activate words2map
-			pip install hdbscan pattern textacy
-			echo "Downloading English language model from Spacy.io for keyterm extraction via the SGRank algorithm in Textacy:"
-			python -m spacy.en.download
+			conda create --name words2map --yes
 		fi
 	fi
+}
+
+install_developer_libraries_as_needed() {
+	if [ $OS_ARCHITECTURE == "Linux" ]; then
+		echo "$(python -mplatform | grep -qi Ubuntu && sudo apt-get update || sudo yum update -y && sudo yum install libffi-devel)"
+	fi
+}
+
+install_python_dependencies() {
+	if hash conda 2>/dev/null; then
+		echo 'Installing Python dependencies for words2map...'
+		source activate words2map
+		conda install --channel spacy --yes spacy cython scikit-learn gensim seaborn mongodb
+		install_developer_libraries_as_needed
+		pip install hdbscan pattern textacy
+		echo "Downloading English language model from Spacy.io for keyterm extraction via the SGRank algorithm in Textacy:"
+		python -m spacy.en.download
+	fi	
 }
 
 refresh_user_shell() {
@@ -97,6 +110,7 @@ install_words2map_if_space_available() {
 		echo "Sorry! $MINIMUM_GB_NEEDED GB of space is needed, but you have only $GB_AVAILABLE GB available. Consider deleting stuff or launching a new computer in the cloud..."
 	else
 		install_conda_if_needed
+		create_conda_environment
 		install_python_dependencies
 		refresh_user_shell
 	fi
