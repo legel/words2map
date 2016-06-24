@@ -90,7 +90,7 @@ install_python_dependencies() {
 		source activate words2map
 		conda install --channel spacy --yes spacy cython scikit-learn gensim seaborn mongodb
 		install_developer_libraries_as_needed
-		pip install hdbscan pattern textacy
+		pip install python-levenshtein hdbscan pattern textacy
 		echo "Downloading English language model from Spacy.io for keyterm extraction in Textacy:"
 		python -m spacy.en.download
 	fi	
