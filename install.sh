@@ -72,23 +72,23 @@ create_conda_environment() {
 	if hash conda 2>/dev/null; then
 		CONDA_ENVIRONMENTS="$(conda env list)"
 		if [[ "$CONDA_ENVIRONMENTS" != *"words2map"* ]]; then
-			conda create --name words2map --yes gcc cython scikit-learn gensim seaborn
+			conda create --name words2map --yes cython scikit-learn gensim seaborn
 		fi
 	fi
 }
 
-# install_developer_libraries_as_needed() {
-# 	OS_ARCHITECTURE="$(uname -s)"
-# 	if [ $OS_ARCHITECTURE == "Linux" ]; then
-# 		echo "$(python -mplatform | grep -qi Ubuntu && sudo apt-get update && sudo apt-get install python-dev libffi-dev libssl-dev libxml2-dev libxslt1-dev || sudo yum update -y && sudo yum install python-devel && sudo yum install libffi-devel)"
-# 	fi
-# }
+install_developer_libraries_as_needed() {
+	OS_ARCHITECTURE="$(uname -s)"
+	if [ $OS_ARCHITECTURE == "Linux" ]; then
+		echo "$(python -mplatform | grep -qi Ubuntu && sudo apt-get update && sudo apt-get install python-dev || sudo yum update -y && sudo yum install python-devel -y && sudo yum groupinstall "Development Tools" -y)"
+	fi
+}
 
 install_python_dependencies() {
 	if hash conda 2>/dev/null; then
 		echo 'Installing Python dependencies for words2map...'
 		source activate words2map
-		# install_developer_libraries_as_needed
+		install_developer_libraries_as_needed
 		pip install hdbscan pattern semidbm
 	fi	
 }
