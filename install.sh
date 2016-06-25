@@ -72,7 +72,7 @@ create_conda_environment() {
 	if hash conda 2>/dev/null; then
 		CONDA_ENVIRONMENTS="$(conda env list)"
 		if [[ "$CONDA_ENVIRONMENTS" != *"words2map"* ]]; then
-			conda create --name words2map --yes
+			conda create --name words2map --yes --no-default-packages 
 		fi
 	fi
 }
