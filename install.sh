@@ -72,7 +72,7 @@ create_conda_environment() {
 	if hash conda 2>/dev/null; then
 		CONDA_ENVIRONMENTS="$(conda env list)"
 		if [[ "$CONDA_ENVIRONMENTS" != *"words2map"* ]]; then
-			conda create --name words2map --yes --no-default-packages 
+			conda create --name words2map --yes cython scikit-learn gensim seaborn
 		fi
 	fi
 }
@@ -88,11 +88,8 @@ install_python_dependencies() {
 	if hash conda 2>/dev/null; then
 		echo 'Installing Python dependencies for words2map...'
 		source activate words2map
-		conda install cython scikit-learn gensim seaborn # mongodb --channel spacy --yes spacy
 		# install_developer_libraries_as_needed
-		pip install hdbscan pattern semidbm # python-levenshtein textacy
-		# echo "Downloading English language model from Spacy.io for keyterm extraction in Textacy:"
-		# python -m spacy.en.download
+		pip install hdbscan pattern semidbm
 	fi	
 }
 
