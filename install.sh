@@ -90,6 +90,7 @@ install_python_dependencies() {
 		source activate words2map
 		install_developer_libraries_as_needed
 		pip install hdbscan pattern semidbm
+		source deactivate
 	fi	
 }
 
