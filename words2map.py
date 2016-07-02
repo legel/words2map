@@ -127,7 +127,14 @@ def research_keywords(something_unknown, model, keyword_count=25, attempts=0):
 		print "After a few tries, it seems that Google is not returning results for us. If you haven't done so already, please try adding your own API key at https://code.google.com/apis/console\n\nFrom that site, simply:\n1. In the API Manager Overview, find \"Custom Search API\" and enable it\n2. Copy your new API key from \"Credentials\"\n3. Paste it in words2map.py in the global variable \"GOOGLE_API_KEY\"\n"
 		sys.exit(1)
 
-def save_vectors(words, vectors):
+def load_derived_vectors(filename):
+	# loads derived vectors from a previous words2map as a standalone Gensim Word2Vec model (https://radimrehurek.com/gensim/models/word2vec.html)
+	filepath = getcwd() + "/derived_vectors/" + filepath_in_words2map_directory
+	model = Word2Vec.load_word2vec_format(filepath, binary=False)
+	return model
+
+def save_derived_vectors(words, vectors):
+	# saves vectors in human readable format, which can be easily and quickly reloaded back into a Gensim Word2Vec model (https://radimrehurek.com/gensim/models/word2vec.html)
 	derived_vectors_directory = getcwd() + "/derived_vectors"
 	files = [f for f in listdir(derived_vectors_directory) if isfile(join(derived_vectors_directory, f))]
 	words2map_files = [int(f.split("_")[1].split(".txt")[0]) for f in files if "words2map_" in f and ".txt" in f]
@@ -136,13 +143,13 @@ def save_vectors(words, vectors):
 	else:
 		map_number = 0
 	filename = "words2map_{}.txt".format(map_number)
-	f = open("{}/{}".format(derived_vectors, filename),'w')
+	f = open("{}/{}".format(derived_vectors_directory, filename),'w')
 	f.write("{} {}\n".format(len(words), 300)) 
 	for word, vector in zip(words, vectors):
 		formatted_word = word.replace(" ", "_")
 		formatted_vector = ' '.join([str(i) for i in vector])
 		f.write("{} {}\n".format(formatted_word, formatted_vector))
-	print "Saved word vectors at"
+	print "Saved word vectors as {}".format(filename)
 	f.close()
 
 def test_performance():
@@ -232,11 +239,13 @@ def derive_vector(word, model):
 
 def clarify(words):
 	# returns vectors for any set of words, and visualizes these words in a 2D plot
-	model = load_model()
-	vectors = [derive_vector(word, model) for word in words]
-	save_vectors(words, vectors)
-	vectors_in_2D = reduce_dimensionality(vectors)
-	visualize_as_clusters(words, vectors_in_2D)
+	# model = load_model()
+	# vectors = [derive_vector(word, model) for word in words]
+	# save_derived_vectors(words, vectors)
+	model = load_derived_vectors("words2map_0.txt")
+	print model["Larry_Page"]
+	# vectors_in_2D = reduce_dimensionality(vectors)
+	# visualize_as_clusters(words, vectors_in_2D)
 
 if __name__ == "__main__":
 	words = ["Larry Page", "Sebastian Thrun", "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "David Blei", "Gunnar Carlson", "Julia Hirschberg", "Liangliang Cao", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Alan Kay", "Thomas Bayes", "Ludwig Boltzmann", "William Rowan Hamilton", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Gordon Moore", "Claude Shannon", "Marvin Minsky", "John McCarthy", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Dennis Ritchie", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Michael I. Jordan", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Marc'Aurelio Ranzato", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Chris Moody", "Christopher Olah", "Tomas Mikolov"]
