@@ -13,6 +13,7 @@ import semidbm
 from cPickle import loads, load, UnpicklingError
 from operator import itemgetter
 from itertools import combinations
+import gc
 import string
 import time
 import sys
@@ -93,6 +94,7 @@ def extract_keywords(url, model, all_keywords):
 		
 def research_keywords(something_unknown, model, keyword_count=25):
 	# searches for something unknown on Google to find 10 related websites and returns a ranked list of keywords from across all sites
+	gc.collect()
 	all_keywords = Manager().dict()
 	engine = Google(license=GOOGLE_API_KEY, throttle=1.0, language="en")
 	try:
@@ -174,6 +176,7 @@ def visualize_as_clusters(words, vectors_in_2D):
 def reduce_dimensionality(vectors, dimensions=2):
 	# t-stochastic neighbor embedding (https://lvdmaaten.github.io/tsne/)
 	print "\nComputing t-SNE reduction of 300D word vectors to {}D".format(dimensions)
+	gc.collect() # collect garbage to clear memory
 	tsne_model = TSNE(n_components=dimensions, n_iter=100000000, metric="correlation", learning_rate=50, early_exaggeration=500.0, perplexity=30.0)
   	np.set_printoptions(suppress=True)
 	vectors_in_2D = tsne_model.fit_transform(np.asarray(vectors).astype('float64'))
