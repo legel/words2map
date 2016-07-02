@@ -92,33 +92,43 @@ def extract_keywords(url, model, all_keywords):
 	except (URLError, URLTimeout, HTTPError, HTTP403Forbidden, SSLError, UnicodeEncodeError, ValueError) as e:
 		pass
 		
-def research_keywords(something_unknown, model, keyword_count=25):
+def research_keywords(something_unknown, model, keyword_count=25, attempts=0):
 	# searches for something unknown on Google to find 10 related websites and returns a ranked list of keywords from across all sites
-	gc.collect()
-	all_keywords = Manager().dict()
-	engine = Google(license=GOOGLE_API_KEY, throttle=1.0, language="en")
-	try:
-		processes = []
-		for website in engine.search(something_unknown, start=1, count=10, type=SEARCH, cached=False):
-			web_mining_process = Process(target=extract_keywords, args=(website.url, model, all_keywords))
-			processes.append(web_mining_process)
-			web_mining_process.start()
-		[process.join() for process in processes]
-	except HTTP403Forbidden:
-		print "\nToday's maximum number of free searches from Google shared by this API across all words2map users has expired.\nPlease get your own key at https://code.google.com/apis/console\n\nFrom that site, simply:\n1. In the API Manager Overview, find \"Custom Search API\" and enable it\n2. Copy your new API key from \"Credentials\"\n3. Paste it in words2map.py in the global variable \"GOOGLE_API_KEY\"\n"
-		sys.exit(1)
-	all_keywords = sorted(all_keywords.items(), key=itemgetter(1), reverse=True)
-	print "\nKeywords about {} to combine vectors for:".format(something_unknown)
-	top_keywords = []
-	for i in range(25):
+	maximum_number_of_google_search_attempts = 3
+	if attempts < maximum_number_of_google_search_attempts:
+		gc.collect()
+		all_keywords = Manager().dict()
+		engine = Google(license=GOOGLE_API_KEY, throttle=1.0, language="en")
 		try:
-			keyword, score = all_keywords[i]
-			top_keywords.append(all_keywords[i])
-			print "{} {}".format(round(score, 3), keyword.encode('utf-8'))
-		except IndexError:
-			break
-	return top_keywords
+			processes = []
+			for website in engine.search(something_unknown, start=1, count=10, type=SEARCH, cached=False):
+				web_mining_process = Process(target=extract_keywords, args=(website.url, model, all_keywords))
+				processes.append(web_mining_process)
+				web_mining_process.start()
+			[process.join() for process in processes]
+		except HTTP403Forbidden:
+			print "\nToday's maximum number of free searches from Google shared by this API across all words2map users has expired.\nPlease get your own key at https://code.google.com/apis/console\n\nFrom that site, simply:\n1. In the API Manager Overview, find \"Custom Search API\" and enable it\n2. Copy your new API key from \"Credentials\"\n3. Paste it in words2map.py in the global variable \"GOOGLE_API_KEY\"\n"
+			sys.exit(1)
+		except URLError, URLTimeout, HTTPError, SSLError:
+			print "\nUnable to reach Google Search for {}, trying one more time".format(something_unknown)
+			return research_keywords(something_unknown, model, attempts=attempts+1)
 
+
+		all_keywords = sorted(all_keywords.items(), key=itemgetter(1), reverse=True)
+		print "\nKeywords about {} to combine vectors for:".format(something_unknown)
+		top_keywords = []
+		for i in range(25):
+			try:
+				keyword, score = all_keywords[i]
+				top_keywords.append(all_keywords[i])
+				print "{} {}".format(round(score, 3), keyword.encode('utf-8'))
+			except IndexError:
+				break
+		return top_keywords
+	else
+		print "After a few tries, it seems that Google is not returning results for us. If you haven't done so already, please try adding your own API key at https://code.google.com/apis/console\n\nFrom that site, simply:\n1. In the API Manager Overview, find \"Custom Search API\" and enable it\n2. Copy your new API key from \"Credentials\"\n3. Paste it in words2map.py in the global variable \"GOOGLE_API_KEY\"\n"
+		sys.exit(1)
+		
 def get_vector(word, model):
 	# returns vector of word as 300 dimensions, each containing a 16 bit floating point number, or None if word doesn't exist
 	try:
@@ -206,7 +216,6 @@ def clarify(words):
 	model = load_model()
 	vectors = [derive_vector(word, model) for word in words]
 	vectors_in_2D = reduce_dimensionality(vectors) 
-	# save vectors and vectors_in_2D in your database
 	visualize_as_clusters(words, vectors_in_2D)
 
 if __name__ == "__main__":
