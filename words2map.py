@@ -130,8 +130,12 @@ def research_keywords(something_unknown, model, keyword_count=25, attempts=0):
 def save_vectors(words, vectors):
 	derived_vectors_directory = getcwd() + "/derived_vectors"
 	files = [f for f in listdir(derived_vectors_directory) if isfile(join(derived_vectors_directory, f))]
-	vector_set_number = max([int(f.split("_")[1].split(".txt")[0]) for f in files if "words2map_" in f and ".txt" in f]) + 1
-	filename = "words2map_{}.txt".format(vector_set_number)
+	words2map_files = [int(f.split("_")[1].split(".txt")[0]) for f in files if "words2map_" in f and ".txt" in f]
+	if words2map_files:
+		map_number = max(words2map_files) + 1
+	else:
+		map_number = 0
+	filename = "words2map_{}.txt".format(map_number)
 	f = open("{}/{}".format(derived_vectors, filename),'w')
 	f.write("{} {}\n".format(len(words), 300)) 
 	for word, vector in zip(words, vectors):
@@ -174,7 +178,11 @@ def visualize_as_clusters(words, vectors_in_2D):
 		plt.annotate(word.decode('utf-8'), (x_vals[i], y_vals[i]))
 	visualizations = getcwd() + "/visualizations"
 	files = [f for f in listdir(visualizations) if isfile(join(visualizations, f))]
-	map_number = max([int(f.split("_")[1].split(".png")[0]) for f in files if "words2map_" in f and ".png" in f]) + 1
+	words2map_files = [int(f.split("_")[1].split(".png")[0]) for f in files if "words2map_" in f and ".png" in f]
+	if words2map_files:
+		map_number = max(words2map_files) + 1
+	else:
+		map_number = 0
 	print "\nVisualization saved! Check out words2map_{}.png".format(map_number)
 	plt.savefig("{}/words2map_{}.png".format(visualizations, map_number))
 
@@ -226,10 +234,10 @@ def clarify(words):
 	# returns vectors for any set of words, and visualizes these words in a 2D plot
 	model = load_model()
 	vectors = [derive_vector(word, model) for word in words]
-	save_vectors(vectors)
-	# vectors_in_2D = reduce_dimensionality(vectors)
-	# visualize_as_clusters(words, vectors_in_2D)
+	save_vectors(words, vectors)
+	vectors_in_2D = reduce_dimensionality(vectors)
+	visualize_as_clusters(words, vectors_in_2D)
 
 if __name__ == "__main__":
-	words = ["Larry Page", "Sebastian Thrun", "Andrew Ng"]# "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "David Blei", "Gunnar Carlson", "Julia Hirschberg", "Liangliang Cao", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Alan Kay", "Thomas Bayes", "Ludwig Boltzmann", "William Rowan Hamilton", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Gordon Moore", "Claude Shannon", "Marvin Minsky", "John McCarthy", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Dennis Ritchie", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Michael I. Jordan", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Marc'Aurelio Ranzato", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Chris Moody", "Christopher Olah", "Tomas Mikolov"]
+	words = ["Larry Page", "Sebastian Thrun", "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "David Blei", "Gunnar Carlson", "Julia Hirschberg", "Liangliang Cao", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Alan Kay", "Thomas Bayes", "Ludwig Boltzmann", "William Rowan Hamilton", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Gordon Moore", "Claude Shannon", "Marvin Minsky", "John McCarthy", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Dennis Ritchie", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Michael I. Jordan", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Marc'Aurelio Ranzato", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Chris Moody", "Christopher Olah", "Tomas Mikolov"]
 	clarify(words)
