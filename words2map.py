@@ -13,7 +13,6 @@ import semidbm
 from cPickle import loads, load, UnpicklingError
 from operator import itemgetter
 from itertools import combinations
-import gc
 import string
 import time
 import sys
@@ -96,7 +95,6 @@ def research_keywords(something_unknown, model, keyword_count=25, attempts=0):
 	# searches for something unknown on Google to find 10 related websites and returns a ranked list of keywords from across all sites
 	maximum_number_of_google_search_attempts = 3
 	if attempts < maximum_number_of_google_search_attempts:
-		gc.collect()
 		all_keywords = Manager().dict()
 		engine = Google(license=GOOGLE_API_KEY, throttle=1.0, language="en")
 		try:
@@ -109,7 +107,7 @@ def research_keywords(something_unknown, model, keyword_count=25, attempts=0):
 		except HTTP403Forbidden:
 			print "\nToday's maximum number of free searches from Google shared by this API across all words2map users has expired.\nPlease get your own key at https://code.google.com/apis/console\n\nFrom that site, simply:\n1. In the API Manager Overview, find \"Custom Search API\" and enable it\n2. Copy your new API key from \"Credentials\"\n3. Paste it in words2map.py in the global variable \"GOOGLE_API_KEY\"\n"
 			sys.exit(1)
-		except URLError, URLTimeout, HTTPError, SSLError:
+		except (URLError, URLTimeout, HTTPError, SSLError):
 			print "\nUnable to reach Google Search for {}, trying one more time".format(something_unknown)
 			return research_keywords(something_unknown, model, attempts=attempts+1)
 
@@ -125,26 +123,23 @@ def research_keywords(something_unknown, model, keyword_count=25, attempts=0):
 			except IndexError:
 				break
 		return top_keywords
-	else
+	else:
 		print "After a few tries, it seems that Google is not returning results for us. If you haven't done so already, please try adding your own API key at https://code.google.com/apis/console\n\nFrom that site, simply:\n1. In the API Manager Overview, find \"Custom Search API\" and enable it\n2. Copy your new API key from \"Credentials\"\n3. Paste it in words2map.py in the global variable \"GOOGLE_API_KEY\"\n"
 		sys.exit(1)
-		
-def get_vector(word, model):
-	# returns vector of word as 300 dimensions, each containing a 16 bit floating point number, or None if word doesn't exist
-	try:
-		formatted_word = word.replace(" ", "_")
-		vector = model[formatted_word] 
-		return np.asarray(vector)
-	except (EOFError, KeyError, UnpicklingError):
-		return None
 
-def get_index(word, model):
-	# returns index of word ranging between 0 and 99,999 (corresponding to the order that words were encountered during word2vec training) or None if it doesn't exist
-	try:
-		word_index = model.vocab[word].index
-		return word_index
-	except (EOFError, KeyError, UnpicklingError):
-		return None
+def save_vectors(words, vectors):
+	derived_vectors_directory = getcwd() + "/derived_vectors"
+	files = [f for f in listdir(derived_vectors_directory) if isfile(join(derived_vectors_directory, f))]
+	vector_set_number = max([int(f.split("_")[1].split(".txt")[0]) for f in files if "words2map_" in f and ".txt" in f]) + 1
+	filename = "words2map_{}.txt".format(vector_set_number)
+	f = open("{}/{}".format(derived_vectors, filename),'w')
+	f.write("{} {}\n".format(len(words), 300)) 
+	for word, vector in zip(words, vectors):
+		formatted_word = word.replace(" ", "_")
+		formatted_vector = ' '.join([str(i) for i in vector])
+		f.write("{} {}\n".format(formatted_word, formatted_vector))
+	print "Saved word vectors at"
+	f.close()
 
 def test_performance():
 	# calculates average time to access a word vector after loading the model in RAM 
@@ -186,7 +181,6 @@ def visualize_as_clusters(words, vectors_in_2D):
 def reduce_dimensionality(vectors, dimensions=2):
 	# t-stochastic neighbor embedding (https://lvdmaaten.github.io/tsne/)
 	print "\nComputing t-SNE reduction of 300D word vectors to {}D".format(dimensions)
-	gc.collect() # collect garbage to clear memory
 	tsne_model = TSNE(n_components=dimensions, n_iter=100000000, metric="correlation", learning_rate=50, early_exaggeration=500.0, perplexity=30.0)
   	np.set_printoptions(suppress=True)
 	vectors_in_2D = tsne_model.fit_transform(np.asarray(vectors).astype('float64'))
@@ -199,6 +193,23 @@ def k_nearest_neighbors(model, k=10, word=None, vector=None):
 		return model.most_similar(positive=[vector], topn=k)
 	else: 
 		raise ValueError("Provide a word or vector as an argument to get k-nearest neighbors\ne.g. k_nearest_neighbors(k=25, word=\"humanity\")")
+
+def get_vector(word, model):
+	# returns vector of word as 300 dimensions, each containing a 16 bit floating point number, or None if word doesn't exist
+	try:
+		formatted_word = word.replace(" ", "_")
+		vector = model[formatted_word] 
+		return np.asarray(vector)
+	except (EOFError, KeyError, UnpicklingError):
+		return None
+
+def get_index(word, model):
+	# returns index of word ranging between 0 and 99,999 (corresponding to the order that words were encountered during word2vec training) or None if it doesn't exist
+	try:
+		word_index = model.vocab[word].index
+		return word_index
+	except (EOFError, KeyError, UnpicklingError):
+		return None
 
 def add_vectors(vectors):
 	# vector addition is done first by averaging the values for each dimension, and then unit normalizing the derived vector (e.g. https://youtu.be/BD8wPsr_DAI)
@@ -215,9 +226,10 @@ def clarify(words):
 	# returns vectors for any set of words, and visualizes these words in a 2D plot
 	model = load_model()
 	vectors = [derive_vector(word, model) for word in words]
-	vectors_in_2D = reduce_dimensionality(vectors) 
-	visualize_as_clusters(words, vectors_in_2D)
+	save_vectors(vectors)
+	# vectors_in_2D = reduce_dimensionality(vectors)
+	# visualize_as_clusters(words, vectors_in_2D)
 
 if __name__ == "__main__":
-	words = ["Larry Page", "Sebastian Thrun", "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "David Blei", "Gunnar Carlson", "Julia Hirschberg", "Liangliang Cao", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Alan Kay", "Thomas Bayes", "Ludwig Boltzmann", "William Rowan Hamilton", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Gordon Moore", "Claude Shannon", "Marvin Minsky", "John McCarthy", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Dennis Ritchie", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Michael I. Jordan", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Marc'Aurelio Ranzato", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Chris Moody", "Christopher Olah", "Tomas Mikolov"]
+	words = ["Larry Page", "Sebastian Thrun", "Andrew Ng"]# "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "David Blei", "Gunnar Carlson", "Julia Hirschberg", "Liangliang Cao", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Alan Kay", "Thomas Bayes", "Ludwig Boltzmann", "William Rowan Hamilton", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Gordon Moore", "Claude Shannon", "Marvin Minsky", "John McCarthy", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Dennis Ritchie", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Michael I. Jordan", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Marc'Aurelio Ranzato", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Chris Moody", "Christopher Olah", "Tomas Mikolov"]
 	clarify(words)
