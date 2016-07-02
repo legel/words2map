@@ -89,7 +89,7 @@ install_python_dependencies() {
 		echo 'Installing Python dependencies for words2map...'
 		source activate words2map
 		install_developer_libraries_as_needed
-		pip install hdbscan pattern semidbm
+		pip install hdbscan pattern semidbm nltk
 		source deactivate
 	fi	
 }
@@ -103,16 +103,10 @@ refresh_user_shell() {
 }
 
 install_words2map_if_space_available() {
-	MINIMUM_GB_NEEDED=10
-	GB_AVAILABLE="$(df -H | grep -vE '^Filesystem' | awk '{ print $4 }' | sed -n 1p | sed 's/G//')"
-	if (( GB_AVAILABLE < MINIMUM_GB_NEEDED )); then
-		echo "Sorry! $MINIMUM_GB_NEEDED GB of space is needed, but you have only $GB_AVAILABLE GB available. Consider deleting stuff or launching a new computer in the cloud..."
-	else
-		install_conda_if_needed
-		create_conda_environment
-		install_python_dependencies
-		refresh_user_shell
-	fi
+	install_conda_if_needed
+	create_conda_environment
+	install_python_dependencies
+	refresh_user_shell
 }
 
 install_words2map_if_space_available
