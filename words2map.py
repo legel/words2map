@@ -129,7 +129,7 @@ def research_keywords(something_unknown, model, keyword_count=25, attempts=0):
 
 def load_derived_vectors(filename):
 	# loads derived vectors from a previous words2map as a standalone Gensim Word2Vec model (https://radimrehurek.com/gensim/models/word2vec.html)
-	filepath = getcwd() + "/derived_vectors/" + filepath_in_words2map_directory
+	filepath = getcwd() + "/derived_vectors/" + filename
 	model = Word2Vec.load_word2vec_format(filepath, binary=False)
 	return model
 
@@ -149,8 +149,9 @@ def save_derived_vectors(words, vectors):
 		formatted_word = word.replace(" ", "_")
 		formatted_vector = ' '.join([str(i) for i in vector])
 		f.write("{} {}\n".format(formatted_word, formatted_vector))
-	print "Saved word vectors as {}".format(filename)
 	f.close()
+	print "Saved word vectors as {}".format(filename)
+	return filename
 
 def test_performance():
 	# calculates average time to access a word vector after loading the model in RAM 
@@ -238,15 +239,18 @@ def derive_vector(word, model):
 	return add_vectors(vectors)
 
 def clarify(words):
-	# returns vectors for any set of words, and visualizes these words in a 2D plot
-	# model = load_model()
-	# vectors = [derive_vector(word, model) for word in words]
-	# save_derived_vectors(words, vectors)
-	model = load_derived_vectors("words2map_0.txt")
-	print model["Larry_Page"]
+	returns vectors for any set of words, and visualizes these words in a 2D plot
+	model = load_model()
+	vectors = [derive_vector(word, model) for word in words]
+	filename = save_derived_vectors(words, vectors)
+	model = load_derived_vectors(filename)
+	words = [word for word in model.vocab]
+	vectors = [model[word] for word in words]
+	print words
+	print vectors
 	# vectors_in_2D = reduce_dimensionality(vectors)
 	# visualize_as_clusters(words, vectors_in_2D)
 
 if __name__ == "__main__":
-	words = ["Larry Page", "Sebastian Thrun", "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "David Blei", "Gunnar Carlson", "Julia Hirschberg", "Liangliang Cao", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Alan Kay", "Thomas Bayes", "Ludwig Boltzmann", "William Rowan Hamilton", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Gordon Moore", "Claude Shannon", "Marvin Minsky", "John McCarthy", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Dennis Ritchie", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Michael I. Jordan", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Marc'Aurelio Ranzato", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Chris Moody", "Christopher Olah", "Tomas Mikolov"]
+	words = ["Larry Page", "Sebastian Thrun"]#, "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "David Blei", "Gunnar Carlson", "Julia Hirschberg", "Liangliang Cao", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Alan Kay", "Thomas Bayes", "Ludwig Boltzmann", "William Rowan Hamilton", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Gordon Moore", "Claude Shannon", "Marvin Minsky", "John McCarthy", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Dennis Ritchie", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Michael I. Jordan", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Marc'Aurelio Ranzato", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Chris Moody", "Christopher Olah", "Tomas Mikolov"]
 	clarify(words)
