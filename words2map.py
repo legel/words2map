@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
-from __future__ import unicode_literals
+#from __future__ import unicode_literals
 import numpy as np
 from gensim.models import Word2Vec
 from sklearn.manifold import TSNE
@@ -98,7 +98,7 @@ def extract_keywords(url, model, all_keywords):
 	except (URLError, URLTimeout, HTTPError, HTTP403Forbidden, SSLError, UnicodeEncodeError, ValueError) as e:
 		pass
 		
-def research_keywords(something_unknown, model, websites_to_scan=100, keyword_count=50, attempts=0):
+def research_keywords(something_unknown, model, websites_to_scan=30, keyword_count=25, attempts=0):
 	# searches for something unknown on Google to find related websites and returns a ranked list of keywords from across all sites
 	maximum_number_of_google_search_attempts = 3
 	if attempts < maximum_number_of_google_search_attempts:
@@ -125,7 +125,7 @@ def research_keywords(something_unknown, model, websites_to_scan=100, keyword_co
 			try:
 				keyword, score = all_keywords[i]
 				top_keywords.append(all_keywords[i])
-				print "{} {}".format(round(score, 3), unidecode(keyword))
+				print "{} {}".format(round(score, 3), unidecode(keyword).replace("_", " "))
 			except IndexError:
 				break
 		return top_keywords
@@ -204,7 +204,7 @@ def visualize_as_clusters(words, vectors_in_2D):
 def reduce_dimensionality(vectors, dimensions=2):
 	# t-stochastic neighbor embedding (https://lvdmaaten.github.io/tsne/)
 	print "\nComputing t-SNE reduction of 300D word vectors to {}D".format(dimensions)
-	tsne_model = TSNE(n_components=dimensions, n_iter=250000000, metric="correlation", learning_rate=50, early_exaggeration=500.0, perplexity=30.0)
+	tsne_model = TSNE(n_components=dimensions, n_iter=2000000, metric="correlation", learning_rate=50, early_exaggeration=500.0, perplexity=30.0)
   	np.set_printoptions(suppress=True)
 	vectors_in_2D = tsne_model.fit_transform(np.asarray(vectors).astype('float64'))
 	return vectors_in_2D
@@ -268,14 +268,13 @@ def clarify(words):
 	#returns vectors for any set of words, and visualizes these words in a 2D plot
 	model = load_model()
 	vectors = [derive_vector(word, model) for word in words]
-	# filename = save_derived_vectors(words, vectors)
-	# model = load_derived_vectors("words2map_0.txt")
-	# words = [word for word in model.vocab]
-	# vectors = [model[word] for word in words]
-	# vectors_in_2D = reduce_dimensionality(vectors)
-	# visualize_as_clusters(words, vectors_in_2D)
+	filename = save_derived_vectors(words, vectors)
+	model = load_derived_vectors(filename)
+	words = [word for word in model.vocab]
+	vectors = [model[word] for word in words]
+	vectors_in_2D = reduce_dimensionality(vectors)
+	visualize_as_clusters(words, vectors_in_2D)
 
 if __name__ == "__main__":
-	words = ["Yann LeCun"]
-	#words = ["Larry Page", "Elon Musk", "Sebastian Thrun", "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "Gunnar Carlson", "Nate Silver", "Alex Pentland", "Hilary Mason", "Julia Hirschberg", "Chris Wiggins", "David Blei", "Michael I. Jordan", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Alan Kay", "Thomas Bayes", "Ludwig Boltzmann", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Claude Shannon", "Marvin Minsky", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Marc'Aurelio Ranzato", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Chris Moody", "Christopher Olah", "Tomas Mikolov"]
-	clarify(words)
+    words = ["Larry Page", "Elon Musk", "Sebastian Thrun", "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "Gunnar Carlson", "Nate Silver", "Alex Pentland", "Hilary Mason", "Julia Hirschberg", "Chris Wiggins", "David Blei", "Michael I. Jordan", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Alan Kay", "Thomas Bayes", "Ludwig Boltzmann", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Claude Shannon", "Marvin Minsky", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Marc'Aurelio Ranzato", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Chris Moody", "Christopher Olah", "Tomas Mikolov"]
+    clarify(words)
