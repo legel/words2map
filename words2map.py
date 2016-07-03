@@ -197,7 +197,7 @@ def visualize_as_clusters(words, vectors_in_2D):
 def reduce_dimensionality(vectors, dimensions=2):
 	# t-stochastic neighbor embedding (https://lvdmaaten.github.io/tsne/)
 	print "\nComputing t-SNE reduction of 300D word vectors to {}D".format(dimensions)
-	tsne_model = TSNE(n_components=dimensions, n_iter=100000000, metric="correlation", learning_rate=50, early_exaggeration=500.0, perplexity=30.0)
+	tsne_model = TSNE(n_components=dimensions, n_iter=10000000, metric="correlation", learning_rate=50, early_exaggeration=500.0, perplexity=30.0)
   	np.set_printoptions(suppress=True)
 	vectors_in_2D = tsne_model.fit_transform(np.asarray(vectors).astype('float64'))
 	return vectors_in_2D
@@ -239,18 +239,16 @@ def derive_vector(word, model):
 	return add_vectors(vectors)
 
 def clarify(words):
-	returns vectors for any set of words, and visualizes these words in a 2D plot
+	#returns vectors for any set of words, and visualizes these words in a 2D plot
 	model = load_model()
 	vectors = [derive_vector(word, model) for word in words]
 	filename = save_derived_vectors(words, vectors)
 	model = load_derived_vectors(filename)
 	words = [word for word in model.vocab]
 	vectors = [model[word] for word in words]
-	print words
-	print vectors
-	# vectors_in_2D = reduce_dimensionality(vectors)
-	# visualize_as_clusters(words, vectors_in_2D)
+	vectors_in_2D = reduce_dimensionality(vectors)
+	visualize_as_clusters(words, vectors_in_2D)
 
 if __name__ == "__main__":
-	words = ["Larry Page", "Sebastian Thrun"]#, "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "David Blei", "Gunnar Carlson", "Julia Hirschberg", "Liangliang Cao", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Alan Kay", "Thomas Bayes", "Ludwig Boltzmann", "William Rowan Hamilton", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Gordon Moore", "Claude Shannon", "Marvin Minsky", "John McCarthy", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Dennis Ritchie", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Michael I. Jordan", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Marc'Aurelio Ranzato", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Chris Moody", "Christopher Olah", "Tomas Mikolov"]
+	words = ["Larry Page", "Sebastian Thrun", "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "David Blei", "Gunnar Carlson", "Julia Hirschberg", "Liangliang Cao", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Alan Kay", "Thomas Bayes", "Ludwig Boltzmann", "William Rowan Hamilton", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Gordon Moore", "Claude Shannon", "Marvin Minsky", "John McCarthy", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Dennis Ritchie", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Michael I. Jordan", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Marc'Aurelio Ranzato", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Chris Moody", "Christopher Olah", "Tomas Mikolov"]
 	clarify(words)
