@@ -1,5 +1,6 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 from __future__ import division
+from __future__ import unicode_literals
 import numpy as np
 from gensim.models import Word2Vec
 from sklearn.manifold import TSNE
@@ -7,12 +8,14 @@ from hdbscan import HDBSCAN
 from nltk import tokenize, bigrams, trigrams, everygrams, FreqDist, corpus
 from pattern.web import Google, SEARCH, download, plaintext, HTTPError, HTTP403Forbidden, URLError, URLTimeout, SearchEngineLimitError
 from ssl import SSLError
+import matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 import semidbm
 from cPickle import loads, load, UnpicklingError
 from operator import itemgetter
 from itertools import combinations
+import unidecode
 import string
 import time
 import sys
@@ -183,7 +186,8 @@ def visualize_as_clusters(words, vectors_in_2D):
 	x_vals = [i[0] for i in vectors]
 	y_vals = [i[1] for i in vectors]
 	for i, word in enumerate(words):
-		plt.annotate(word.decode('utf-8'), (x_vals[i], y_vals[i]))
+		word = unidecode(word.decode('utf-8')).replace("_", " ")
+		plt.annotate(word, (x_vals[i], y_vals[i]))
 	visualizations = getcwd() + "/visualizations"
 	files = [f for f in listdir(visualizations) if isfile(join(visualizations, f))]
 	words2map_files = [int(f.split("_")[1].split(".png")[0]) for f in files if "words2map_" in f and ".png" in f]
@@ -250,5 +254,5 @@ def clarify(words):
 	visualize_as_clusters(words, vectors_in_2D)
 
 if __name__ == "__main__":
-	words = ["Larry Page", "Sebastian Thrun", "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "David Blei", "Gunnar Carlson", "Julia Hirschberg", "Liangliang Cao", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Alan Kay", "Thomas Bayes", "Ludwig Boltzmann", "William Rowan Hamilton", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Gordon Moore", "Claude Shannon", "Marvin Minsky", "John McCarthy", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Dennis Ritchie", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Michael I. Jordan", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Marc'Aurelio Ranzato", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Chris Moody", "Christopher Olah", "Tomas Mikolov"]
+	words = ["Larry Page", "Elon Musk", "Sebastian Thrun", "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "Gunnar Carlson", "Nate Silver", "Alex Pentland", "Hilary Mason", "Julia Hirschberg", "Chris Wiggins", "David Blei", "Michael I. Jordan", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Alan Kay", "Thomas Bayes", "Ludwig Boltzmann", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Claude Shannon", "Marvin Minsky", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Marc'Aurelio Ranzato", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Chris Moody", "Christopher Olah", "Tomas Mikolov"]
 	clarify(words)
