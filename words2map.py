@@ -15,7 +15,7 @@ import semidbm
 from cPickle import loads, load, UnpicklingError
 from operator import itemgetter
 from itertools import combinations
-import unidecode
+from unidecode import unidecode
 import string
 import time
 import sys
@@ -84,45 +84,48 @@ def evaluate_keyword(frequency, word_index, max_word_index=100000):
 	return frequency * rarity
 
 def extract_keywords(url, model, all_keywords):
+	minimum_word_index_for_unigrams = 20000
 	try:
 		text = plaintext(download(url))
-		words = [word for word in tokenize.word_tokenize(text) if word.isalnum() and word not in corpus.stopwords.words('english')]
+		words = [word for word in tokenize.word_tokenize(text) if word.isalnum() and word.lower() not in corpus.stopwords.words('english') and word.lower() not in url]
 		for collocation, frequency in get_collocations(words):
 			word_index = get_index(collocation, model)
-			if word_index and collocation.lower() not in corpus.stopwords.words('english'):
-				all_keywords[collocation] = all_keywords.get(collocation, 0) + evaluate_keyword(frequency, word_index)
+			if word_index:
+				if collocation.count('_') == 0 and word_index < minimum_word_index_for_unigrams:
+					pass
+				else:
+					all_keywords[collocation] = all_keywords.get(collocation, 0) + evaluate_keyword(frequency, word_index)
 	except (URLError, URLTimeout, HTTPError, HTTP403Forbidden, SSLError, UnicodeEncodeError, ValueError) as e:
 		pass
 		
-def research_keywords(something_unknown, model, keyword_count=25, attempts=0):
-	# searches for something unknown on Google to find 10 related websites and returns a ranked list of keywords from across all sites
+def research_keywords(something_unknown, model, websites_to_scan=100, keyword_count=50, attempts=0):
+	# searches for something unknown on Google to find related websites and returns a ranked list of keywords from across all sites
 	maximum_number_of_google_search_attempts = 3
 	if attempts < maximum_number_of_google_search_attempts:
 		all_keywords = Manager().dict()
 		engine = Google(license=GOOGLE_API_KEY, throttle=1.0, language="en")
 		try:
 			processes = []
-			for website in engine.search(something_unknown, start=1, count=10, type=SEARCH, cached=False):
-				web_mining_process = Process(target=extract_keywords, args=(website.url, model, all_keywords))
-				processes.append(web_mining_process)
-				web_mining_process.start()
-			[process.join() for process in processes]
+			for page in range(int(websites_to_scan/10)):
+				for website in engine.search(something_unknown, start=page+1, count=10, type=SEARCH, cached=False):
+					web_mining_process = Process(target=extract_keywords, args=(website.url, model, all_keywords))
+					processes.append(web_mining_process)
+					web_mining_process.start()
+				[process.join() for process in processes]
 		except HTTP403Forbidden:
 			print "\nToday's maximum number of free searches from Google shared by this API across all words2map users has expired.\nPlease get your own key at https://code.google.com/apis/console\n\nFrom that site, simply:\n1. In the API Manager Overview, find \"Custom Search API\" and enable it\n2. Copy your new API key from \"Credentials\"\n3. Paste it in words2map.py in the global variable \"GOOGLE_API_KEY\"\n"
 			sys.exit(1)
 		except (URLError, URLTimeout, HTTPError, SSLError):
 			print "\nUnable to reach Google Search for {}, trying one more time".format(something_unknown)
 			return research_keywords(something_unknown, model, attempts=attempts+1)
-
-
 		all_keywords = sorted(all_keywords.items(), key=itemgetter(1), reverse=True)
 		print "\nKeywords about {} to combine vectors for:".format(something_unknown)
 		top_keywords = []
-		for i in range(25):
+		for i in range(keyword_count):
 			try:
 				keyword, score = all_keywords[i]
 				top_keywords.append(all_keywords[i])
-				print "{} {}".format(round(score, 3), keyword.encode('utf-8'))
+				print "{} {}".format(round(score, 3), unidecode(keyword))
 			except IndexError:
 				break
 		return top_keywords
@@ -186,7 +189,7 @@ def visualize_as_clusters(words, vectors_in_2D):
 	x_vals = [i[0] for i in vectors]
 	y_vals = [i[1] for i in vectors]
 	for i, word in enumerate(words):
-		word = unidecode(word.decode('utf-8')).replace("_", " ")
+		word = unidecode(word).replace("_", " ")
 		plt.annotate(word, (x_vals[i], y_vals[i]))
 	visualizations = getcwd() + "/visualizations"
 	files = [f for f in listdir(visualizations) if isfile(join(visualizations, f))]
@@ -201,7 +204,7 @@ def visualize_as_clusters(words, vectors_in_2D):
 def reduce_dimensionality(vectors, dimensions=2):
 	# t-stochastic neighbor embedding (https://lvdmaaten.github.io/tsne/)
 	print "\nComputing t-SNE reduction of 300D word vectors to {}D".format(dimensions)
-	tsne_model = TSNE(n_components=dimensions, n_iter=10000000, metric="correlation", learning_rate=50, early_exaggeration=500.0, perplexity=30.0)
+	tsne_model = TSNE(n_components=dimensions, n_iter=250000000, metric="correlation", learning_rate=50, early_exaggeration=500.0, perplexity=30.0)
   	np.set_printoptions(suppress=True)
 	vectors_in_2D = tsne_model.fit_transform(np.asarray(vectors).astype('float64'))
 	return vectors_in_2D
@@ -214,22 +217,41 @@ def k_nearest_neighbors(model, k=10, word=None, vector=None):
 	else: 
 		raise ValueError("Provide a word or vector as an argument to get k-nearest neighbors\ne.g. k_nearest_neighbors(k=25, word=\"humanity\")")
 
-def get_vector(word, model):
+def get_vector(word, model, lowercase=True):
 	# returns vector of word as 300 dimensions, each containing a 16 bit floating point number, or None if word doesn't exist
-	try:
+	if lowercase:
+		formatted_word = word.replace(" ", "_").lower()
+		try:
+			vector = model[formatted_word] 
+			return np.asarray(vector)
+		except (EOFError, KeyError, UnpicklingError):
+			return get_vector(word, model, lowercase=False)
+	else:
 		formatted_word = word.replace(" ", "_")
-		vector = model[formatted_word] 
-		return np.asarray(vector)
-	except (EOFError, KeyError, UnpicklingError):
-		return None
+		try:
+			vector = model[formatted_word] 
+			return np.asarray(vector)
+		except (EOFError, KeyError, UnpicklingError):
+			return None
 
-def get_index(word, model):
-	# returns index of word ranging between 0 and 99,999 (corresponding to the order that words were encountered during word2vec training) or None if it doesn't exist
-	try:
-		word_index = model.vocab[word].index
-		return word_index
-	except (EOFError, KeyError, UnpicklingError):
-		return None
+
+
+def get_index(word, model, lowercase=True):
+	# returns index of word ranging between 0 and 99,999 (corresponding to the order that words were encountered during word2vec training), trying first for the lowercase version if that's set to True, and returning None if neither exists
+	if lowercase:
+		formatted_word = word.replace(" ", "_").lower()
+		try:
+			word_index = model.vocab[formatted_word].index
+			return word_index
+		except (EOFError, KeyError, UnpicklingError):
+			return get_index(word, model, lowercase=False)
+	else:
+		formatted_word = word.replace(" ", "_")
+		try:
+			word_index = model.vocab[formatted_word].index
+			return word_index
+		except (EOFError, KeyError, UnpicklingError):
+			return None
 
 def add_vectors(vectors):
 	# vector addition is done first by averaging the values for each dimension, and then unit normalizing the derived vector (e.g. https://youtu.be/BD8wPsr_DAI)
@@ -246,13 +268,14 @@ def clarify(words):
 	#returns vectors for any set of words, and visualizes these words in a 2D plot
 	model = load_model()
 	vectors = [derive_vector(word, model) for word in words]
-	filename = save_derived_vectors(words, vectors)
-	model = load_derived_vectors(filename)
-	words = [word for word in model.vocab]
-	vectors = [model[word] for word in words]
-	vectors_in_2D = reduce_dimensionality(vectors)
-	visualize_as_clusters(words, vectors_in_2D)
+	# filename = save_derived_vectors(words, vectors)
+	# model = load_derived_vectors("words2map_0.txt")
+	# words = [word for word in model.vocab]
+	# vectors = [model[word] for word in words]
+	# vectors_in_2D = reduce_dimensionality(vectors)
+	# visualize_as_clusters(words, vectors_in_2D)
 
 if __name__ == "__main__":
-	words = ["Larry Page", "Elon Musk", "Sebastian Thrun", "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "Gunnar Carlson", "Nate Silver", "Alex Pentland", "Hilary Mason", "Julia Hirschberg", "Chris Wiggins", "David Blei", "Michael I. Jordan", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Alan Kay", "Thomas Bayes", "Ludwig Boltzmann", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Claude Shannon", "Marvin Minsky", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Marc'Aurelio Ranzato", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Chris Moody", "Christopher Olah", "Tomas Mikolov"]
+	words = ["Yann LeCun"]
+	#words = ["Larry Page", "Elon Musk", "Sebastian Thrun", "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "Gunnar Carlson", "Nate Silver", "Alex Pentland", "Hilary Mason", "Julia Hirschberg", "Chris Wiggins", "David Blei", "Michael I. Jordan", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Alan Kay", "Thomas Bayes", "Ludwig Boltzmann", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Claude Shannon", "Marvin Minsky", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Marc'Aurelio Ranzato", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Chris Moody", "Christopher Olah", "Tomas Mikolov"]
 	clarify(words)
