@@ -132,6 +132,15 @@ def research_keywords(something_unknown, model, websites_to_scan=10, keyword_cou
 		print "After a few tries, it seems that Google is not returning results for us. If you haven't done so already, please try adding your own API key at https://code.google.com/apis/console\n\nFrom that site, simply:\n1. In the API Manager Overview, find \"Custom Search API\" and enable it\n2. Copy your new API key from \"Credentials\"\n3. Paste it in words2map.py in the global variable \"GOOGLE_API_KEY\"\n"
 		sys.exit(1)
 
+def load_words(filename):
+	words = []
+	filepath = getcwd() + "/words/" + filename
+	with open(filepath) as fp:
+		for i, line in enumerate(fp):
+			clean_line = line.split("\r")[0].split("\n")[0]
+			words.append(clean_line)
+	return words
+
 def load_derived_vectors(filename):
 	# loads derived vectors from a previous words2map as a standalone Gensim Word2Vec model (https://radimrehurek.com/gensim/models/word2vec.html)
 	filepath = getcwd() + "/derived_vectors/" + filename
@@ -281,5 +290,6 @@ def clarify(words):
 	visualize_as_clusters(words, vectors_in_2D)
 
 if __name__ == "__main__":
+	# words = load_words("leading_scientists.txt")
     words = ["Larry Page", "Elon Musk", "Sebastian Thrun", "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "Gunnar Carlson", "Nate Silver", "Alex Pentland", "Hilary Mason", "Julia Hirschberg", "Liangliang Cao", "James Fan (NLP)", "Chris Wiggins", "David Blei", "Michael I. Jordan", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Thomas Bayes", "Ludwig Boltzmann", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Claude Shannon", "Marvin Minsky", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Christopher E. Moody", "Christopher Olah", "Tomas Mikolov"]
     clarify(words)
