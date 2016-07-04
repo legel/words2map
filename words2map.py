@@ -7,7 +7,7 @@ from hdbscan import HDBSCAN
 from nltk import tokenize, bigrams, trigrams, everygrams, FreqDist, corpus
 from pattern.web import Google, SEARCH, download, plaintext, HTTPError, HTTP403Forbidden, URLError, URLTimeout, SearchEngineLimitError
 from ssl import SSLError
-import matplotlib; matplotlib.use('TkAgg')
+import matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 import semidbm
@@ -278,9 +278,8 @@ def derive_vector(word, model):
 	vectors = [get_vector(keyword, model) for keyword, score in keywords]
 	return add_vectors(vectors)
 
-def clarify(words):
-	#returns vectors for any set of words, and visualizes these words in a 2D plot
-	model = load_model()
+def clarify(words, model):
+	#derives vectors for any set of words, and visualizes these words in 2D
 	vectors = [derive_vector(word, model) for word in words]
 	filename = save_derived_vectors(words, vectors)
 	model = load_derived_vectors(filename)
@@ -290,6 +289,6 @@ def clarify(words):
 	visualize_as_clusters(words, vectors_in_2D)
 
 if __name__ == "__main__":
-	# words = load_words("leading_scientists.txt")
-    words = ["Larry Page", "Elon Musk", "Sebastian Thrun", "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "Gunnar Carlson", "Nate Silver", "Alex Pentland", "Hilary Mason", "Julia Hirschberg", "Liangliang Cao", "James Fan (NLP)", "Chris Wiggins", "David Blei", "Michael I. Jordan", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Thomas Bayes", "Ludwig Boltzmann", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Claude Shannon", "Marvin Minsky", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Christopher E. Moody", "Christopher Olah", "Tomas Mikolov"]
-    clarify(words)
+    model = load_model()
+    words = load_words("famous_people.csv")
+    clarify(words, model)
