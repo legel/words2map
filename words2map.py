@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
-#from __future__ import unicode_literals
 import numpy as np
 from gensim.models import Word2Vec
 from sklearn.manifold import TSNE
@@ -8,7 +7,7 @@ from hdbscan import HDBSCAN
 from nltk import tokenize, bigrams, trigrams, everygrams, FreqDist, corpus
 from pattern.web import Google, SEARCH, download, plaintext, HTTPError, HTTP403Forbidden, URLError, URLTimeout, SearchEngineLimitError
 from ssl import SSLError
-import matplotlib; matplotlib.use('Agg')
+import matplotlib; matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 import semidbm
@@ -98,7 +97,7 @@ def extract_keywords(url, model, all_keywords):
 	except (URLError, URLTimeout, HTTPError, HTTP403Forbidden, SSLError, UnicodeEncodeError, ValueError) as e:
 		pass
 		
-def research_keywords(something_unknown, model, websites_to_scan=30, keyword_count=25, attempts=0):
+def research_keywords(something_unknown, model, websites_to_scan=10, keyword_count=25, attempts=0):
 	# searches for something unknown on Google to find related websites and returns a ranked list of keywords from across all sites
 	maximum_number_of_google_search_attempts = 3
 	if attempts < maximum_number_of_google_search_attempts:
@@ -156,7 +155,7 @@ def save_derived_vectors(words, vectors):
 		formatted_vector = ' '.join([str(i) for i in vector])
 		f.write("{} {}\n".format(formatted_word, formatted_vector))
 	f.close()
-	print "Saved word vectors as {}".format(filename)
+	print "\nSaved word vectors as {}".format(filename)
 	return filename
 
 def test_performance():
@@ -173,24 +172,7 @@ def test_performance():
 	average_time = np.mean(times)
 	print "You can count on it taking about {} μs to check / get each word vector at runtime, after loading the model".format(round(total_time, 2), round(average_time * 100000, 2))
 
-def visualize_as_clusters(words, vectors_in_2D):
-	# HDBSCAN, i.e. hierarchical density-based spatial clustering of applications with noise (https://github.com/lmcinnes/hdbscan)
-	vectors = vectors_in_2D
-	sns.set_context('poster')
-	sns.set_style('white')
-	sns.set_color_codes()
-	plot_kwds = {'alpha' : 0.5, 's' : 400, 'linewidths': 0}
-	labels = HDBSCAN(min_cluster_size=2).fit_predict(vectors)
-	palette = sns.color_palette("husl", np.unique(labels).max() + 1)
-	colors = [palette[x] if x >= 0 else (0.0, 0.0, 0.0) for x in labels]
-	plt.figure(figsize=(25, 25))
-	plt.scatter(vectors.T[0], vectors.T[1], c=colors, **plot_kwds)
-	plt.axis('off')
-	x_vals = [i[0] for i in vectors]
-	y_vals = [i[1] for i in vectors]
-	for i, word in enumerate(words):
-		word = unidecode(word).replace("_", " ")
-		plt.annotate(word, (x_vals[i], y_vals[i]))
+def get_visualization_file_path():
 	visualizations = getcwd() + "/visualizations"
 	files = [f for f in listdir(visualizations) if isfile(join(visualizations, f))]
 	words2map_files = [int(f.split("_")[1].split(".png")[0]) for f in files if "words2map_" in f and ".png" in f]
@@ -199,12 +181,36 @@ def visualize_as_clusters(words, vectors_in_2D):
 	else:
 		map_number = 0
 	print "\nVisualization saved! Check out words2map_{}.png".format(map_number)
-	plt.savefig("{}/words2map_{}.png".format(visualizations, map_number))
+	return "{}/words2map_{}.png".format(visualizations, map_number)
+
+def visualize_as_clusters(words, vectors_in_2D):
+	# HDBSCAN, i.e. hierarchical density-based spatial clustering of applications with noise (https://github.com/lmcinnes/hdbscan)
+	vectors = vectors_in_2D
+	sns.set_context('poster')
+	sns.set_color_codes()
+	plot_kwds = {'alpha' : 0.5, 's' : 500, 'linewidths': 0}
+	labels = HDBSCAN(min_cluster_size=2).fit_predict(vectors)
+	palette = sns.color_palette("husl", np.unique(labels).max() + 1)
+	colors = [palette[x] if x >= 0 else (0.0, 0.0, 0.0) for x in labels]
+	fig = plt.figure(figsize=(30, 30))
+	plt.scatter(vectors.T[0], vectors.T[1], c=colors, **plot_kwds)
+	plt.axis('off')
+	x_vals = [i[0] for i in vectors]
+	y_vals = [i[1] for i in vectors]
+	plt.ylim(min(y_vals)-0.3, max(y_vals)+0.3)    
+	plt.xlim(min(x_vals)-0.3, max(x_vals)+0.3) 
+	font_path = getcwd() + '/fonts/Comfortaa-Regular.ttf'
+	font_property = matplotlib.font_manager.FontProperties(fname=font_path, size=24)
+	for i, word in enumerate(words):
+		word = unidecode(word).replace("_", " ")
+		text_object = plt.annotate(word, xy=(x_vals[i], y_vals[i]+0.1), font_properties=font_property, color=colors[i], ha="center")
+	plt.subplots_adjust(left=(500/3000), right=(2900/3000), top=1.0, bottom=(300/2700))
+	plt.savefig(get_visualization_file_path(), bbox_inches="tight")
 
 def reduce_dimensionality(vectors, dimensions=2):
 	# t-stochastic neighbor embedding (https://lvdmaaten.github.io/tsne/)
 	print "\nComputing t-SNE reduction of 300D word vectors to {}D".format(dimensions)
-	tsne_model = TSNE(n_components=dimensions, n_iter=2000000, metric="correlation", learning_rate=50, early_exaggeration=500.0, perplexity=30.0)
+	tsne_model = TSNE(n_components=dimensions, n_iter=10000000, metric="correlation", learning_rate=50, early_exaggeration=500.0, perplexity=30.0)
   	np.set_printoptions(suppress=True)
 	vectors_in_2D = tsne_model.fit_transform(np.asarray(vectors).astype('float64'))
 	return vectors_in_2D
@@ -233,7 +239,6 @@ def get_vector(word, model, lowercase=True):
 			return np.asarray(vector)
 		except (EOFError, KeyError, UnpicklingError):
 			return None
-
 
 
 def get_index(word, model, lowercase=True):
@@ -276,5 +281,5 @@ def clarify(words):
 	visualize_as_clusters(words, vectors_in_2D)
 
 if __name__ == "__main__":
-    words = ["Larry Page", "Elon Musk", "Sebastian Thrun", "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "Gunnar Carlson", "Nate Silver", "Alex Pentland", "Hilary Mason", "Julia Hirschberg", "Chris Wiggins", "David Blei", "Michael I. Jordan", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Alan Kay", "Thomas Bayes", "Ludwig Boltzmann", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Claude Shannon", "Marvin Minsky", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Marc'Aurelio Ranzato", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Chris Moody", "Christopher Olah", "Tomas Mikolov"]
+    words = ["Larry Page", "Elon Musk", "Sebastian Thrun", "Andrew Ng", "Yoshua Bengio", "Yann LeCun", "Geoffrey Hinton", "Jürgen Schmidhuber", "Bruno Olshausen", "J.J. Hopfield", "Randall O\'Reilly", "Demis Hassabis", "Peter Norvig", "Jeff Dean", "Daphne Koller", "Gunnar Carlson", "Nate Silver", "Alex Pentland", "Hilary Mason", "Julia Hirschberg", "Liangliang Cao", "James Fan (NLP)", "Chris Wiggins", "David Blei", "Michael I. Jordan", "Rocco Servedio", "Leslie Valiant", "Vladimir Vapnik", "Alan Turing", "Georg Cantor", "Thomas Bayes", "Ludwig Boltzmann", "Peter Dirichlet", "Carl Gauss", "Donald Knuth", "Claude Shannon", "Marvin Minsky", "John von Neumann", "Thomas J. Watson", "Ken Thompson", "Linus Torvalds", "Douglas Engelbart", "Grace Hopper", "Marissa Mayer", "Bill Gates", "Steve Jobs", "Steve Wozniak", "Jeff Bezos", "Mark Zuckerberg", "Eric Schmidt", "Sergey Brin", "Tim Berners Lee", "Stephen Wolfram", "Bill Joy", "Vint Cerf", "Paul Graham", "Richard Hamming", "Eric Horvitz", "Stephen Omohundro", "Jaron Lanier", "Bruce Schneier", "Ray Kurzweil", "Richard Socher", "Alex Krizhevsky", "Rajat Raina", "Adam Coates", "Léon Bottou", "Greg Corrado", "Honglak Lee", "Quoc V. Le", "Radim Řehůřek", "Tom De Smedt", "Christopher E. Moody", "Christopher Olah", "Tomas Mikolov"]
     clarify(words)
