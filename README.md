@@ -7,5 +7,7 @@ git clone https://github.com/overlap-ai/words2map.git
 cd words2map
 ./install.sh
 source activate words2map
+tar xzf vectors.tar.gz
+python -m nltk.downloader punkt stopwords
 python words2map.py
 ```
