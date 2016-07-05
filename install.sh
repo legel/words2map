@@ -89,7 +89,7 @@ install_python_dependencies() {
 		echo 'Installing Python dependencies for words2map...'
 		source activate words2map
 		install_developer_libraries_as_needed
-		pip install hdbscan pattern semidbm nltk
+		pip install hdbscan pattern semidbm nltk unidecode
 		source deactivate
 	fi	
 }
