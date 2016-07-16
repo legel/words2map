@@ -276,7 +276,7 @@ def add_vectors(vectors):
 
 def derive_vector(word, model, rederive=True, google_api_key=GOOGLE_API_KEY):
 	# extracts keywords from Google searches and adds their vectors; if rederive is True, a word that already has a vector for will still be rederived, which can help to normalize clustering especially for data visualization 
-	if not rederive_all:
+	if not rederive:
 		vector = get_vector(word, model)
 		if type(vector) != type(None):
 			return memory_efficient_vector(vector)
