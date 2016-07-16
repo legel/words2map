@@ -23,7 +23,7 @@ from os import listdir, getcwd
 from os.path import isfile, join
 from multiprocessing import Process, Manager
 
-GOOGLE_API_KEY = "AIzaSyB4f-UO51_qDWXIwSwR92aejZso6hHJEY4" # Google provides everyone with 100 free searches per day, and then $5 per 1,000 searches after that, and a limit of 10,000 per day. However new users get $300 free in their first 60 days, so that's your first 60,000 words2map free.
+GOOGLE_API_KEY = "AIzaSyB4f-UO51_qDWXIwSwR92aejZso6hHJEY4" # Google provides everyone with 100 free searches per day, and then $5 per 1,000 searches after that, and a limit of 10,000 per day. However new users get $300 free in their first 60 days, so that's your first 60,000 words2map free. Today all words2map users share this, but please get your own key to reduce the shared load and make your word mapping sustainable: go to https://code.google.com/apis/console - from that site, simply (1) In the API Manager Overview, find "Custom Search API" and enable it; (2) Copy your new API key from "Credentials"; and (3) Paste it in words2map.py in the global variable "GOOGLE_API_KEY"
 
 class Loader(dict):
 	# loads ~20 MB of indexes for word2vec and index2word into RAM for fast dictionary reads
@@ -50,10 +50,9 @@ class Loader(dict):
 	def itervalues(self):
 		return (self._dbm[key] for key in self._dbm.keys())
 
-def load_model():
+def load_model(directory="{}/vectors".format(getcwd())):
 	# current model contains 100,000 vectors of 300 elements, each element containing a 16 bit floating point number, such that vectors total ~60 MB uncompressed; note that there is practically no loss of precision in saving vectors with 16 bits versus 32 bits, while data consumption is halved...
 	print "Loading 100,000 word vectors..."
-	directory = getcwd() + "/vectors"
 	model = load(open(join(directory, 'model.pickle')))
 	model.vocab = Loader(join(directory, 'word_to_index'))
 	model.index2word = Loader(join(directory, 'index_to_word'))
@@ -83,7 +82,7 @@ def evaluate_keyword(frequency, word_index, max_word_index=100000):
 	return frequency * rarity
 
 def extract_keywords(url, model, all_keywords):
-	minimum_word_index_for_unigrams = 20000
+	minimum_word_index_for_unigrams = 20000 # minimum rarity of word to be considered a keyword
 	try:
 		text = plaintext(download(url))
 		words = [word for word in tokenize.word_tokenize(text) if word.isalnum() and word.lower() not in corpus.stopwords.words('english') and word.lower() not in url]
@@ -97,12 +96,12 @@ def extract_keywords(url, model, all_keywords):
 	except (URLError, URLTimeout, HTTPError, HTTP403Forbidden, SSLError, UnicodeEncodeError, ValueError) as e:
 		pass
 		
-def research_keywords(something_unknown, model, websites_to_scan=10, keyword_count=25, attempts=0):
+def research_keywords(something_unknown, model, websites_to_scan=10, keyword_count=25, attempts=0, google_api_key=GOOGLE_API_KEY):
 	# searches for something unknown on Google to find related websites and returns a ranked list of keywords from across all sites
 	maximum_number_of_google_search_attempts = 3
 	if attempts < maximum_number_of_google_search_attempts:
 		all_keywords = Manager().dict()
-		engine = Google(license=GOOGLE_API_KEY, throttle=1.0, language="en")
+		engine = Google(license=google_api_key, throttle=1.0, language="en")
 		try:
 			processes = []
 			for page in range(int(websites_to_scan/10)):
@@ -161,7 +160,7 @@ def save_derived_vectors(words, vectors):
 	f.write("{} {}\n".format(len(words), 300)) 
 	for word, vector in zip(words, vectors):
 		formatted_word = word.replace(" ", "_")
-		formatted_vector = ' '.join([str(i) for i in vector])
+		formatted_vector = ','.join([str(i) for i in vector])
 		f.write("{} {}\n".format(formatted_word, formatted_vector))
 	f.close()
 	print "\nSaved word vectors as {}".format(filename)
@@ -233,7 +232,7 @@ def k_nearest_neighbors(model, k=10, word=None, vector=None):
 		raise ValueError("Provide a word or vector as an argument to get k-nearest neighbors\ne.g. k_nearest_neighbors(k=25, word=\"humanity\")")
 
 def get_vector(word, model, lowercase=True):
-	# returns vector of word as 300 dimensions, each containing a 16 bit floating point number, or None if word doesn't exist
+	# returns vector of word as 300 dimensions, each containing a 16 bit floating point number, trying first for the lowercase version if that's set to True, and returning None if neither exists
 	if lowercase:
 		formatted_word = word.replace(" ", "_").lower()
 		try:
@@ -248,7 +247,6 @@ def get_vector(word, model, lowercase=True):
 			return np.asarray(vector)
 		except (EOFError, KeyError, UnpicklingError):
 			return None
-
 
 def get_index(word, model, lowercase=True):
 	# returns index of word ranging between 0 and 99,999 (corresponding to the order that words were encountered during word2vec training), trying first for the lowercase version if that's set to True, and returning None if neither exists
@@ -267,16 +265,25 @@ def get_index(word, model, lowercase=True):
 		except (EOFError, KeyError, UnpicklingError):
 			return None
 
+def memory_efficient_vector(vector, significant_digits_per_dimension=2):
+	# upon analysis of dimensions of original GoogleNews vectors, values of each dimension range from ~ -0.16 to 0.16 and each value seems to be significant to about 0.01 (analysis at https://docs.google.com/spreadsheets/d/1cgvgcoy8Es36GAZ67FyoheYKivUni1BNXykNi4GNPRc/edit?usp=sharing)
+	return [round(dimension, significant_digits_per_dimension) for dimension in vector] 
+
 def add_vectors(vectors):
-	# vector addition is done first by averaging the values for each dimension, and then unit normalizing the derived vector (e.g. https://youtu.be/BD8wPsr_DAI)
+	# vector addition is done first by averaging the values for each dimension, and then unit normalizing the derived vector (see e.g. Udacity deep learning instructor explain: https://youtu.be/BD8wPsr_DAI)
 	derived_vector = np.average(np.array(vectors), axis=0)
 	return derived_vector / np.linalg.norm(derived_vector)
 
-def derive_vector(word, model):
-	# extracts keywords from Google searches and adds their vectors
-	keywords = research_keywords(word, model)
+def derive_vector(word, model, rederive=True, google_api_key=GOOGLE_API_KEY):
+	# extracts keywords from Google searches and adds their vectors; if rederive is True, a word that already has a vector for will still be rederived, which can help to normalize clustering especially for data visualization 
+	if not rederive_all:
+		vector = get_vector(word, model)
+		if type(vector) != type(None):
+			return memory_efficient_vector(vector)
+	keywords = research_keywords(something_unknown=word, model=model, google_api_key=GOOGLE_API_KEY) # see top of file about API key
 	vectors = [get_vector(keyword, model) for keyword, score in keywords]
-	return add_vectors(vectors)
+	derived_vector = add_vectors(vectors)
+	return memory_efficient_vector(derived_vector)
 
 def clarify(words, model):
 	#derives vectors for any set of words, and visualizes these words in 2D

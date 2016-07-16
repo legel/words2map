@@ -110,3 +110,4 @@ install_words2map_if_space_available() {
 }
 
 install_words2map_if_space_available
+# create and remove swap file if RAM is not large enough for installation, as shown here: http://stackoverflow.com/a/18335151/1241952
