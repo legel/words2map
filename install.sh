@@ -80,7 +80,8 @@ create_conda_environment() {
 install_developer_libraries_as_needed() {
 	OS_ARCHITECTURE="$(uname -s)"
 	if [ $OS_ARCHITECTURE == "Linux" ]; then
-		echo "$(python -mplatform | grep -qi Ubuntu && sudo apt-get update && sudo apt-get install python-dev || sudo yum update -y && sudo yum install python-devel -y && sudo yum groupinstall "Development Tools" -y)"
+		# TODO - address at least for Ubuntu this script not always running
+		$(python -mplatform | grep -qi Ubuntu && sudo apt-get update && sudo apt-get install python-dev || sudo yum update -y && sudo yum install python-devel -y && sudo yum groupinstall "Development Tools" -y)
 	fi
 }
 
