@@ -81,8 +81,8 @@ install_developer_libraries_as_needed() {
 	OS_ARCHITECTURE="$(uname -s)"
 	if [ $OS_ARCHITECTURE == "Linux" ]; then
 		# currently dumb handling of ubuntu v. other linux distros
-		$(grep -qi Ubuntu && sudo apt-get update && sudo apt-get install python-dev)
-		$(sudo yum update -y && sudo yum install python-devel -y && sudo yum groupinstall "Development Tools" -y)
+		echo "$(grep -qi Ubuntu && sudo apt-get --yes --force-yes update && sudo apt-get --yes --force-yes install python-dev)"
+		echo "$(sudo yum update -y && sudo yum install python-devel -y && sudo yum groupinstall "Development Tools" -y)"
 	fi
 }
 
