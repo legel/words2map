@@ -193,7 +193,7 @@ def get_visualization_file_path():
 
 def generate_clusters(words, vectors_in_2D):
 	# HDBSCAN, i.e. hierarchical density-based spatial clustering of applications with noise (https://github.com/lmcinnes/hdbscan)
-	vectors = vectors_in_2D
+	vectors = np.vstack(vectors_in_2D)
 	sns.set_context('poster')
 	sns.set_color_codes()
 	plot_kwds = {'alpha' : 0.5, 's' : 500, 'linewidths': 0}
