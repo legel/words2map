@@ -193,7 +193,7 @@ def get_visualization_file_path():
 
 def generate_clusters(words, vectors_in_2D):
 	# HDBSCAN, i.e. hierarchical density-based spatial clustering of applications with noise (https://github.com/lmcinnes/hdbscan)
-	vectors = np.vstack(vectors_in_2D)
+	vectors = vectors_in_2D
 	sns.set_context('poster')
 	sns.set_color_codes()
 	plot_kwds = {'alpha' : 0.5, 's' : 500, 'linewidths': 0}
@@ -210,8 +210,12 @@ def generate_clusters(words, vectors_in_2D):
 	font_path = getcwd() + '/fonts/Comfortaa-Regular.ttf'
 	font_property = matplotlib.font_manager.FontProperties(fname=font_path, size=24)
 	for i, word in enumerate(words):
-		word = unidecode(word).replace("_", " ")
-		text_object = plt.annotate(word, xy=(x_vals[i], y_vals[i]+0.1), font_properties=font_property, color=colors[i], ha="center")
+		if type(word) != type(None):
+			if type(word) != type(""):
+				word = unidecode(word).replace("_", " ")
+			else:
+				word = word.replace("_", " ")
+			text_object = plt.annotate(word, xy=(x_vals[i], y_vals[i]+0.1), font_properties=font_property, color=colors[i], ha="center")
 	plt.subplots_adjust(left=(500/3000), right=(2900/3000), top=1.0, bottom=(300/2700))
 	plt.savefig(get_visualization_file_path(), bbox_inches="tight")
 	return clusters
