@@ -191,15 +191,15 @@ def get_visualization_file_path():
 	print "\nVisualization saved! Check out words2map_{}.png".format(map_number)
 	return "{}/words2map_{}.png".format(visualizations, map_number)
 
-def visualize_as_clusters(words, vectors_in_2D):
+def generate_clusters(words, vectors_in_2D):
 	# HDBSCAN, i.e. hierarchical density-based spatial clustering of applications with noise (https://github.com/lmcinnes/hdbscan)
 	vectors = vectors_in_2D
 	sns.set_context('poster')
 	sns.set_color_codes()
 	plot_kwds = {'alpha' : 0.5, 's' : 500, 'linewidths': 0}
-	labels = HDBSCAN(min_cluster_size=2).fit_predict(vectors)
-	palette = sns.color_palette("husl", np.unique(labels).max() + 1)
-	colors = [palette[x] if x >= 0 else (0.0, 0.0, 0.0) for x in labels]
+	clusters = HDBSCAN(min_cluster_size=1).fit_predict(vectors)
+	palette = sns.color_palette("husl", np.unique(clusters).max() + 1)
+	colors = [palette[cluster_index] if cluster_index >= 0 else (0.0, 0.0, 0.0) for cluster_index in clusters]
 	fig = plt.figure(figsize=(30, 30))
 	plt.scatter(vectors.T[0], vectors.T[1], c=colors, **plot_kwds)
 	plt.axis('off')
@@ -214,6 +214,7 @@ def visualize_as_clusters(words, vectors_in_2D):
 		text_object = plt.annotate(word, xy=(x_vals[i], y_vals[i]+0.1), font_properties=font_property, color=colors[i], ha="center")
 	plt.subplots_adjust(left=(500/3000), right=(2900/3000), top=1.0, bottom=(300/2700))
 	plt.savefig(get_visualization_file_path(), bbox_inches="tight")
+	return clusters
 
 def reduce_dimensionality(vectors, dimensions=2):
 	# t-stochastic neighbor embedding (https://lvdmaaten.github.io/tsne/)
@@ -286,14 +287,14 @@ def derive_vector(word, model, rederive=True, google_api_key=GOOGLE_API_KEY):
 	return memory_efficient_vector(derived_vector)
 
 def clarify(words, model):
-	#derives vectors for any set of words, and visualizes these words in 2D
+	#derives vectors for any set of words and visualizes structured clusters
 	vectors = [derive_vector(word, model) for word in words]
 	filename = save_derived_vectors(words, vectors)
 	model = load_derived_vectors(filename)
 	words = [word for word in model.vocab]
 	vectors = [model[word] for word in words]
 	vectors_in_2D = reduce_dimensionality(vectors)
-	visualize_as_clusters(words, vectors_in_2D)
+	cluster_indexes = generate_clusters(words, vectors_in_2D) # clusters of just one word have an index of -1, otherwise they have unique positive integer indexes
 
 if __name__ == "__main__":
     model = load_model()
