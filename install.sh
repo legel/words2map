@@ -92,8 +92,15 @@ install_python_dependencies() {
 		source activate words2map
 		install_developer_libraries_as_needed
 		pip install hdbscan pattern semidbm nltk unidecode
-		source deactivate
 	fi	
+}
+
+prepare_words2map() {
+	echo "$(tar xzf vectors.tar.gz)"
+	echo "$(python -m nltk.downloader punkt stopwords)"
+	GREEN="\033[0;32m"
+	NOCOLOR="\033[0m"
+	echo -e "Everything installed! Run ${GREEN}python words2map.py${NOCOLOR} to generate your first map."
 }
 
 refresh_user_shell() {
