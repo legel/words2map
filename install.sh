@@ -89,7 +89,7 @@ install_developer_libraries_as_needed() {
 install_hdbscan() {
 	git clone https://github.com/lmcinnes/hdbscan/archive/master.zip
 	cd hdbscan
-	
+
 }
 
 install_python_dependencies() {
@@ -106,9 +106,12 @@ prepare_words2map() {
 	echo "$(python -m nltk.downloader punkt stopwords)"
 	GREEN="\033[0;32m"
 	NOCOLOR="\033[0m"
-	echo "Everything installed -"
+	echo ""
+	echo "Everything installed!"
+	echo ""
 	echo -e "Activate the words2map virtual machine by typing ${GREEN}source activate words2map${NOCOLOR}, then..."
 	echo -e "${GREEN}python words2map.py${NOCOLOR} to generate your first map!"
+	echo ""
 }
 
 refresh_user_shell() {

@@ -160,7 +160,7 @@ def save_derived_vectors(words, vectors):
 	f.write("{} {}\n".format(len(words), 300)) 
 	for word, vector in zip(words, vectors):
 		formatted_word = word.replace(" ", "_")
-		formatted_vector = ','.join([str(i) for i in vector])
+		formatted_vector = ' '.join([str(i) for i in vector])
 		f.write("{} {}\n".format(formatted_word, formatted_vector))
 	f.close()
 	print "\nSaved word vectors as {}".format(filename)
