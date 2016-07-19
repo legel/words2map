@@ -86,6 +86,12 @@ install_developer_libraries_as_needed() {
 	fi
 }
 
+install_hdbscan() {
+	git clone https://github.com/lmcinnes/hdbscan/archive/master.zip
+	cd hdbscan
+	
+}
+
 install_python_dependencies() {
 	if hash conda 2>/dev/null; then
 		echo 'Installing Python dependencies for words2map...'
@@ -100,7 +106,9 @@ prepare_words2map() {
 	echo "$(python -m nltk.downloader punkt stopwords)"
 	GREEN="\033[0;32m"
 	NOCOLOR="\033[0m"
-	echo -e "Everything installed! Run ${GREEN}python words2map.py${NOCOLOR} to generate your first map."
+	echo "Everything installed -"
+	echo -e "Activate the words2map virtual machine by typing ${GREEN}source activate words2map${NOCOLOR}, then..."
+	echo -e "${GREEN}python words2map.py${NOCOLOR} to generate your first map!"
 }
 
 refresh_user_shell() {
@@ -115,6 +123,7 @@ install_words2map_if_space_available() {
 	install_conda_if_needed
 	create_conda_environment
 	install_python_dependencies
+	prepare_words2map
 	refresh_user_shell
 }
 
