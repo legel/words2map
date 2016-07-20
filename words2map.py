@@ -215,7 +215,7 @@ def generate_clusters(words, vectors_in_2D):
 				word = unidecode(word).replace("_", " ")
 			else:
 				word = word.replace("_", " ")
-			text_object = plt.annotate(word, xy=(x_vals[i], y_vals[i]+0.1), font_properties=font_property, color=colors[i], ha="center")
+			text_object = plt.annotate(word, xy=(x_vals[i], y_vals[i]+0.05), font_properties=font_property, color=colors[i], ha="center")
 	plt.subplots_adjust(left=(500/3000), right=(2900/3000), top=1.0, bottom=(300/2700))
 	plt.savefig(get_visualization_file_path(), bbox_inches="tight")
 	return clusters
@@ -223,7 +223,7 @@ def generate_clusters(words, vectors_in_2D):
 def reduce_dimensionality(vectors, dimensions=2):
 	# t-stochastic neighbor embedding (https://lvdmaaten.github.io/tsne/)
 	print "\nComputing t-SNE reduction of 300D word vectors to {}D".format(dimensions)
-	tsne_model = TSNE(n_components=dimensions, n_iter=10000000, metric="correlation", learning_rate=50, early_exaggeration=5000.0, perplexity=30.0)
+	tsne_model = TSNE(n_components=dimensions, n_iter=10000000, metric="correlation", learning_rate=50, early_exaggeration=500.0, perplexity=40.0)
   	np.set_printoptions(suppress=True)
 	vectors_in_2D = tsne_model.fit_transform(np.asarray(vectors).astype('float64'))
 	return vectors_in_2D
@@ -302,5 +302,5 @@ def clarify(words, model):
 
 if __name__ == "__main__":
     model = load_model()
-    words = load_words("leading_scientists.csv")
+    words = load_words("tech.csv")
     clarify(words, model)
