@@ -1,13 +1,10 @@
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/architecture.png" /></span></p>
 
-<p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/leading_scientists.png" /></span></p>
-
 ```
 git clone https://github.com/overlap-ai/words2map.git
 cd words2map
 ./install.sh
-source activate words2map
-tar xzf vectors.tar.gz
-python -m nltk.downloader punkt stopwords
-python words2map.py
 ```
+
+<p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/leading_scientists.png" /></span></p>
+
