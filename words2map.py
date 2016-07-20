@@ -197,7 +197,7 @@ def generate_clusters(words, vectors_in_2D):
 	sns.set_context('poster')
 	sns.set_color_codes()
 	plot_kwds = {'alpha' : 0.5, 's' : 500, 'linewidths': 0}
-	clusters = HDBSCAN(min_cluster_size=1).fit_predict(vectors)
+	clusters = HDBSCAN(min_cluster_size=2).fit_predict(vectors)
 	palette = sns.color_palette("husl", np.unique(clusters).max() + 1)
 	colors = [palette[cluster_index] if cluster_index >= 0 else (0.0, 0.0, 0.0) for cluster_index in clusters]
 	fig = plt.figure(figsize=(30, 30))
@@ -223,7 +223,7 @@ def generate_clusters(words, vectors_in_2D):
 def reduce_dimensionality(vectors, dimensions=2):
 	# t-stochastic neighbor embedding (https://lvdmaaten.github.io/tsne/)
 	print "\nComputing t-SNE reduction of 300D word vectors to {}D".format(dimensions)
-	tsne_model = TSNE(n_components=dimensions, n_iter=100000000, metric="correlation", learning_rate=50, early_exaggeration=500.0, perplexity=30.0)
+	tsne_model = TSNE(n_components=dimensions, n_iter=10000000, metric="correlation", learning_rate=50, early_exaggeration=5000.0, perplexity=30.0)
   	np.set_printoptions(suppress=True)
 	vectors_in_2D = tsne_model.fit_transform(np.asarray(vectors).astype('float64'))
 	return vectors_in_2D
