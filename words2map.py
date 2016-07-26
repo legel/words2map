@@ -180,7 +180,7 @@ def test_performance():
 	average_time = np.mean(times)
 	print "You can count on it taking about {} μs to check / get each word vector at runtime, after loading the model".format(round(total_time, 2), round(average_time * 100000, 2))
 
-def get_visualization_file_path():
+def get_visualization_file_path(print_status):
 	visualizations = getcwd() + "/visualizations"
 	files = [f for f in listdir(visualizations) if isfile(join(visualizations, f))]
 	words2map_files = [int(f.split("_")[1].split(".png")[0]) for f in files if "words2map_" in f and ".png" in f]
@@ -188,10 +188,11 @@ def get_visualization_file_path():
 		map_number = max(words2map_files) + 1
 	else:
 		map_number = 0
-	print "\nVisualization saved! Check out words2map_{}.png".format(map_number)
+	if print_status:
+		print "\nVisualization saved! Check out words2map_{}.png".format(map_number)
 	return "{}/words2map_{}.png".format(visualizations, map_number)
 
-def generate_clusters(words, vectors_in_2D):
+def generate_clusters(words, vectors_in_2D, print_status=True):
 	# HDBSCAN, i.e. hierarchical density-based spatial clustering of applications with noise (https://github.com/lmcinnes/hdbscan)
 	vectors = vectors_in_2D
 	sns.set_context('poster')
@@ -217,7 +218,7 @@ def generate_clusters(words, vectors_in_2D):
 				word = word.replace("_", " ")
 			text_object = plt.annotate(word, xy=(x_vals[i], y_vals[i]+0.05), font_properties=font_property, color=colors[i], ha="center")
 	plt.subplots_adjust(left=(500/3000), right=(2900/3000), top=1.0, bottom=(300/2700))
-	plt.savefig(get_visualization_file_path(), bbox_inches="tight")
+	plt.savefig(get_visualization_file_path(print_status), bbox_inches="tight")
 	return clusters
 
 def reduce_dimensionality(vectors, dimensions=2):
