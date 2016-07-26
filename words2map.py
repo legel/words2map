@@ -51,7 +51,7 @@ class Loader(dict):
 		return (self._dbm[key] for key in self._dbm.keys())
 
 def load_model(directory="{}/vectors".format(getcwd())):
-	# current model contains 100,000 vectors of 300 elements, each element containing a 16 bit floating point number, such that vectors total ~60 MB uncompressed; note that there is practically no loss of precision in saving vectors with 16 bits versus 32 bits, while data consumption is halved...
+	# current model contains 100,000 vectors of 300 elements, each element containing a 16 bit floating point number, such that vectors total ~60 MB uncompressed; note that there is practically no loss of precision in saving vectors with 16 bits versus 32 bits, while data consumption is halved
 	print "Loading 100,000 word vectors..."
 	model = load(open(join(directory, 'model.pickle')))
 	model.vocab = Loader(join(directory, 'word_to_index'))
@@ -272,7 +272,7 @@ def get_index(word, model, lowercase=True):
 			return None
 
 def memory_efficient_vector(vector, significant_digits_per_dimension=2):
-	# upon analysis of dimensions of original GoogleNews vectors, values of each dimension range from ~ -0.16 to 0.16 and each value seems to be significant to about 0.01 (analysis at https://docs.google.com/spreadsheets/d/1cgvgcoy8Es36GAZ67FyoheYKivUni1BNXykNi4GNPRc/edit?usp=sharing)
+	# upon analysis of dimensions of original GoogleNews vectors, values seem to be significant to about 0.01 (analysis at https://docs.google.com/spreadsheets/d/1cgvgcoy8Es36GAZ67FyoheYKivUni1BNXykNi4GNPRc/edit?usp=sharing), while at least 3x memory compression seems possible here in the future following the distribution of elements of word2vec corpus (see for data: https://docs.google.com/spreadsheets/d/1RT0TphDA3Rk1Mi5Rg6aj9IpuGn1hFcK92PeffCsOmM4/edit?usp=sharing)
 	return [round(dimension, significant_digits_per_dimension) for dimension in vector] 
 
 def add_vectors(vectors):
