@@ -72,7 +72,7 @@ create_conda_environment() {
 	if hash conda 2>/dev/null; then
 		CONDA_ENVIRONMENTS="$(conda env list)"
 		if [[ "$CONDA_ENVIRONMENTS" != *"words2map"* ]]; then
-			conda create --name words2map --yes cython gensim=0.13.4.1 scikit-learn seaborn
+			conda create --name words2map --yes cython scikit-learn seaborn
 			conda install --name words2map --yes -c conda-forge hdbscan
 		fi
 	fi
@@ -97,6 +97,8 @@ install_python_dependencies() {
 		source activate words2map
 		install_developer_libraries_as_needed
 		pip install pattern semidbm nltk unidecode
+		pip install -U gensim
+
 	fi	
 }
 
