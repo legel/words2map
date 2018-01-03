@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 import numpy as np
-from gensim.models import KeyedVectors
+from gensim.models import Word2Vec
 from sklearn.manifold import TSNE
 from hdbscan import HDBSCAN
 from nltk import tokenize, bigrams, trigrams, everygrams, FreqDist, corpus
@@ -143,20 +143,23 @@ def load_words(filename):
 def load_derived_vectors(filename):
 	# loads derived vectors from a previous words2map as a standalone Gensim Word2Vec model (https://radimrehurek.com/gensim/models/word2vec.html)
 	filepath = getcwd() + "/derived_vectors/" + filename
-	model = KeyedVectors.load_word2vec_format(filepath, binary=False)
+	model = Word2Vec.load_word2vec_format(filepath, binary=False)
 	return model
 
-def save_derived_vectors(words, vectors):
+def save_derived_vectors(words, vectors, filename=None):
 	# saves vectors in human readable format, which can be easily and quickly reloaded back into a Gensim Word2Vec model (https://radimrehurek.com/gensim/models/word2vec.html)
 	derived_vectors_directory = getcwd() + "/derived_vectors"
-	files = [f for f in listdir(derived_vectors_directory) if isfile(join(derived_vectors_directory, f))]
-	words2map_files = [int(f.split("_")[1].split(".txt")[0]) for f in files if "words2map_" in f and ".txt" in f]
-	if words2map_files:
-		map_number = max(words2map_files) + 1
-	else:
+
+        if type(filename) == type(None):
+            files = [f for f in listdir(derived_vectors_directory) if isfile(join(derived_vectors_directory, f))]
+	    words2map_files = [int(f.split("_")[1].split(".txt")[0]) for f in files if "words2map_" in f and ".txt" in f]
+	    if words2map_files:
+	        map_number = max(words2map_files) + 1
+	    else:
 		map_number = 0
-	filename = "words2map_{}.txt".format(map_number)
-	f = open("{}/{}".format(derived_vectors_directory, filename),'w')
+	    filename = "words2map_{}.txt".format(map_number)
+        
+        f = open("{}/{}".format(derived_vectors_directory, filename),'w')
 	f.write("{} {}\n".format(len(words), 300)) 
 	for word, vector in zip(words, vectors):
 		formatted_word = word.replace(" ", "_")
