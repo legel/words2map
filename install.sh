@@ -72,8 +72,8 @@ create_conda_environment() {
 	if hash conda 2>/dev/null; then
 		CONDA_ENVIRONMENTS="$(conda env list)"
 		if [[ "$CONDA_ENVIRONMENTS" != *"words2map"* ]]; then
-			conda create --name words2map --yes cython gensim=0.12.4 scikit-learn seaborn
-			conda install --name words2map -c conda-forge hdbscan=0.8.11
+			conda create --name words2map --yes cython gensim=0.13.4.1 scikit-learn seaborn
+			conda install --name words2map --yes -c conda-forge hdbscan
 		fi
 	fi
 }
