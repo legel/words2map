@@ -20,8 +20,9 @@ save_derived_vectors(words, vectors, "passions.txt")
 ### Analyze derived word vectors
 ```python
 from words2map import *
+from pprint import pprint
 model = load_derived_vectors("passions.txt")
-print k_nearest_neighbors(model=model, k=10, word="Data_Scientists")
+pprint(k_nearest_neighbors(model=model, k=10, word="Data_Scientists"))
 ```
 
 ### Visualize clusters of vectors
