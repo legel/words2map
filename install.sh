@@ -72,7 +72,7 @@ create_conda_environment() {
 	if hash conda 2>/dev/null; then
 		CONDA_ENVIRONMENTS="$(conda env list)"
 		if [[ "$CONDA_ENVIRONMENTS" != *"words2map"* ]]; then
-			conda create --name words2map --yes cython scikit-learn gensim=0.12.4 seaborn
+			conda create --name words2map --yes cython numpy= scikit-learn gensim=0.12.4 seaborn
 		fi
 	fi
 }
@@ -109,8 +109,7 @@ prepare_words2map() {
 	echo ""
 	echo "Everything installed!"
 	echo ""
-	echo -e "Activate the words2map virtual machine by typing ${GREEN}source activate words2map${NOCOLOR}, then..."
-	echo -e "${GREEN}python words2map.py${NOCOLOR} to generate your first map!"
+	echo -e "Activate the words2map virtual machine by typing ${GREEN}source activate words2map${NOCOLOR}"
 	echo ""
 }
 
