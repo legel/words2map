@@ -97,7 +97,7 @@ install_python_dependencies() {
 		source activate words2map
 		install_developer_libraries_as_needed
 		pip install pattern semidbm nltk unidecode
-		pip install -U gensim
+		pip install gensim==0.13.3
 
 	fi	
 }
