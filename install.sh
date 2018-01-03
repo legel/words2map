@@ -72,7 +72,8 @@ create_conda_environment() {
 	if hash conda 2>/dev/null; then
 		CONDA_ENVIRONMENTS="$(conda env list)"
 		if [[ "$CONDA_ENVIRONMENTS" != *"words2map"* ]]; then
-			conda create --name words2map --yes cython numpy=1.12.1 scikit-learn gensim=0.12.4 seaborn
+			conda create --name words2map --yes cython numpy=1.12.1 scikit-learn=0.16 gensim=0.12.4 seaborn
+			conda install --name words2map -c conda-forge hdbscan=0.8.11
 		fi
 	fi
 }
@@ -87,9 +88,7 @@ install_developer_libraries_as_needed() {
 }
 
 install_hdbscan() {
-	git clone https://github.com/lmcinnes/hdbscan/archive/master.zip
-	cd hdbscan
-
+	git clone https://github.com/lmcinnes/hdbscan.git
 }
 
 install_python_dependencies() {
@@ -97,7 +96,7 @@ install_python_dependencies() {
 		echo 'Installing Python dependencies for words2map...'
 		source activate words2map
 		install_developer_libraries_as_needed
-		pip install hdbscan pattern semidbm nltk unidecode
+		pip install pattern semidbm nltk unidecode
 	fi	
 }
 
