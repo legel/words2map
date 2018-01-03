@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 import numpy as np
-from gensim.models import Word2Vec
+from gensim.models import KeyedVectors
 from sklearn.manifold import TSNE
 from hdbscan import HDBSCAN
 from nltk import tokenize, bigrams, trigrams, everygrams, FreqDist, corpus
@@ -143,7 +143,7 @@ def load_words(filename):
 def load_derived_vectors(filename):
 	# loads derived vectors from a previous words2map as a standalone Gensim Word2Vec model (https://radimrehurek.com/gensim/models/word2vec.html)
 	filepath = getcwd() + "/derived_vectors/" + filename
-	model = Word2Vec.load_word2vec_format(filepath, binary=False)
+	model = KeyedVectors.load_word2vec_format(filepath, binary=False)
 	return model
 
 def save_derived_vectors(words, vectors):
@@ -300,8 +300,3 @@ def clarify(words, model):
 	vectors = [model[word] for word in words]
 	vectors_in_2D = reduce_dimensionality(vectors)
 	cluster_indexes = generate_clusters(words, vectors_in_2D) # clusters of just one word have an index of -1, otherwise they have unique positive integer indexes
-
-if __name__ == "__main__":
-    model = load_model()
-    words = load_words("tech.csv")
-    clarify(words, model)
