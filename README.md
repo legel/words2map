@@ -1,4 +1,5 @@
-```
+
+```shell
 git clone https://github.com/overlap-ai/words2map.git
 cd words2map
 ./install.sh
