@@ -1,12 +1,11 @@
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/architecture.png" /></span></p>
  
 > *This project is deprecated and no longer supported. The basic ideas are still useful:*  
-> *(1) derive new vectors at runtime by searching related websites online, combining words found with known vectors*  
-> *(2) embed high dimensional derived vectors into a lower dimensional space for visualization*  
-> *For the 2nd objective, when words2map was originally developed t-SNE made the most sense for dimensionality reduction.*  
-> *At the time of this writing however (2020), I would recoomend using [UMAP](https://github.com/lmcinnes/umap).*  
+> *(1) instantly derive [OOV](https://medium.com/@shabeelkandi/handling-out-of-vocabulary-words-in-natural-language-processing-based-on-context-4bbba16214d5) vectors by searching online and combining vectors of known words*  
+> *(2) embed and cluster N-dimensional vectors into 2/3-dimensional space for visualization*
+> *For the 1st objective, hooking your NLP system into a search engine like Google could still work.
+> *For the 2nd objective, I would now recoomend using [UMAP](https://github.com/lmcinnes/umap).*  
 > *See this [archived blog post](http://web.archive.org/web/20160806040004if_/http://blog.yhat.com/posts/words2map.html) for more details on the algorithms*
-
 
 ### Derive new vectors for words by searching online
 
