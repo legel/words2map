@@ -1,11 +1,13 @@
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/architecture.png" /></span></p>
 
-### Install
-```shell
-git clone https://github.com/overlap-ai/words2map.git
-cd words2map
-./install.sh
-```
+Note:
+This project is deprecated and no longer supported. 
+The basic ideas are still powerful:
+(1) derive new vectors online, from existing vectors
+(2) embed high dimensional derived vectors into a lower dimensional space for visualization
+
+For the 2nd objective, when words2map was originally developed t-SNE made the most sense for dimensionality reduction.
+At the time of this writing however (2020), I would recoomend using [UMAP](https://github.com/lmcinnes/umap).
 
 ### Derive new vectors for words by searching online
 
@@ -33,6 +35,14 @@ words = [word for word in model.vocab]
 vectors = [model[word] for word in words]
 vectors_in_2D = reduce_dimensionality(vectors)
 generate_clusters(words, vectors_in_2D)
+```
+
+### Install
+
+```shell
+git clone https://github.com/overlap-ai/words2map.git
+cd words2map
+./install.sh
 ```
 
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/passions.png" /></span></p>
