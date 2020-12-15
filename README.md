@@ -1,12 +1,12 @@
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/architecture.png" /></span></p>
 
-> *Note:*\n
-> *This project is deprecated and no longer supported.*\n
-> *The basic ideas are still useful:*\n
-> *(1) derive new vectors on-demand by searching online, and then combining words found with existing vectors*\n
-> *(2) embed high dimensional derived vectors into a lower dimensional space for visualization*\n
-> *For the 2nd objective, when words2map was originally developed t-SNE made the most sense for dimensionality reduction.*\n
-> *At the time of this writing however (2020), I would recoomend using [UMAP](https://github.com/lmcinnes/umap).*\n
+> *Note:*  
+> *This project is deprecated and no longer supported.*  
+> *The basic ideas are still useful:*  
+> *(1) derive new vectors on-demand by searching online, and then combining words found with existing vectors*  
+> *(2) embed high dimensional derived vectors into a lower dimensional space for visualization*  
+> *For the 2nd objective, when words2map was originally developed t-SNE made the most sense for dimensionality reduction.*  
+> *At the time of this writing however (2020), I would recoomend using [UMAP](https://github.com/lmcinnes/umap).*  
 
 ### Derive new vectors for words by searching online
 
