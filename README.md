@@ -2,8 +2,8 @@
  
 > *This project is deprecated and no longer supported. The basic ideas are still useful:*  
 > *(1) instantly derive [OOV](https://medium.com/@shabeelkandi/handling-out-of-vocabulary-words-in-natural-language-processing-based-on-context-4bbba16214d5) vectors by searching online and combining vectors of known words*  
-> *(2) embed and cluster N-dimensional vectors into 2/3-dimensional space for visualization*
-> *For the 1st objective, hooking your NLP system into a search engine like Google could still work.
+> *(2) embed and cluster N-dimensional vectors into 2/3-dimensional space for visualization*  
+> *For the 1st objective, hooking your NLP system into a search engine like Google could still work.  
 > *For the 2nd objective, I would now recoomend using [UMAP](https://github.com/lmcinnes/umap).*  
 > *See this [archived blog post](http://web.archive.org/web/20160806040004if_/http://blog.yhat.com/posts/words2map.html) for more details on the algorithms*
 
