@@ -5,7 +5,7 @@
 > *(2) embed and cluster N-dimensional vectors into 2/3-dimensional space for visualization*  
 > *For the 1st objective, hooking your NLP system into a search engine like Google could still work.*  
 > *For the 2nd objective, I would now recoomend using [UMAP](https://github.com/lmcinnes/umap).*  
-> *See this [archived blog post](http://web.archive.org/web/20160806040004if_/http://blog.yhat.com/posts/words2map.html) for more details on the algorithms*
+> *See this [archived blog post](http://web.archive.org/web/20160806040004if_/http://blog.yhat.com/posts/words2map.html) for more details on the words2map algorithm.*
 
 ### Derive new vectors for words by searching online
 
