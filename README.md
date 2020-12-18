@@ -10,7 +10,7 @@
 
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/legel/words2map/master/visualizations/human_robot_cyborg.png" /></span></p>
 
-> *(7) Visualize quality by reducing dimensions to 2D or 3D (e.g [t-SNE](https://lvdmaaten.github.io/tsne/) works, but [UMAP](https://github.com/lmcinnes/umap) now recommended)*  
+> *(7) Visualize by reducing dimensions to 2D/3D (e.g [t-SNE](https://lvdmaaten.github.io/tsne/) works, but [UMAP](https://github.com/lmcinnes/umap) recommended)*  
 > *(8) Finally, show clusters with [HDBSCAN](https://github.com/scikit-learn-contrib/hdbscan), color-coded in a perceptually uniform space*  
 
 > *These "words2map" were all derived as explained above:*  
