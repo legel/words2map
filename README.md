@@ -1,20 +1,27 @@
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/architecture.png" /></span></p>
  
-> *This project is deprecated and no longer supported. The core novel contribution could still useful to modern NLP R&D:*  
-> *Instantly derive [OOV](https://medium.com/@shabeelkandi/handling-out-of-vocabulary-words-in-natural-language-processing-based-on-context-4bbba16214d5) vectors by searching online and combining vectors of known words.  Hooking a vector-based NLP system into a search engine like Google could still work. The basic idea is search out-of-vocabulary words and phrases as soon as they're encountered - just like a human would - and then parse the top N websites that are related to these.  For this project, N = 50.  Through a variety of classical NLP techniques for prioritizing the most important distinctive words on every website, which alredy exist in a vector corpus, all of these vectors are the summed to derive a new word vector.  Here is how that summation looks:*  
+> *Instantly derive [OOV](https://medium.com/@shabeelkandi/handling-out-of-vocabulary-words-in-natural-language-processing-based-on-context-4bbba16214d5) vectors by searching online.  
+> *Here is the algorithm:
+> *(1) Hook up a vector-based NLP system with real-time OOV parsing requirements into a search engine API like Google / Bing*  
+> *(2) When out-of-vocabulary (OOV) words and phrases are encountered, automatically search for them on the web - just like a human would*  
+> *(3) Download and parse N-grams (e.g. N = 5) for all text from the top M websites (e.g. M = 50)
+> *(4) Filter all N-grams that are already known in an existing vector vocublary (e.g. word2vec corpus from Google in 2013 with 3 million N-grams) 
+> *(5) Weight and rank the important of all found N-grams by multiplying a metric of their global frequency in the vocabulary corpus, by a metric of local frequency (e.g. [TF-IDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf)*  
+> *(6) Sum the top T ranked vectors, with or without weighting.  In practice a simple element-wise sum without weighting can work well, i.e.*   
 
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/legel/words2map/master/visualizations/human_robot_cyborg.png" /></span></p>
 
+> *(7) Visualize quality of derivation by reducing dimensionality of all vectors to 2D / 3D (e.g [t-SNE](https://lvdmaaten.github.io/tsne/) was originally uesd, but now [UMAP](https://github.com/lmcinnes/umap) is recommended).
+> *(8) Finally, show clusters with [HDBSCAN](https://github.com/scikit-learn-contrib/hdbscan) and color-code them in a perceptually uniformly distributed space
 
 > *In practice the derived vectors from autonomous real-time online research tend to be surprisingly good.  All of the following vectors were derived in this way:*  
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/passions.png" /></span></p>
-
-> *As another quick update, the above visualization used t-SNE for reducing dimensionality from 300D to 2D, and then HDBSCAN for clustering.*  
-> *I would still recommend the HDBSCAN algorithm for any topologically sensitive clustering application, but for dimensionality reduction I would now recommend [UMAP](https://github.com/lmcinnes/umap).*  
+<p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/famous.png" /></span></p>
+<p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/tech.png" /></span></p>
 
 > *See this [archived blog post](http://web.archive.org/web/20160806040004if_/http://blog.yhat.com/posts/words2map.html) for more details on the words2map algorithm.*
 
-### Documentation: Derive new vectors for words by searching online
+### Derive new vectors for words by searching online
 
 ```python
 from words2map import *
