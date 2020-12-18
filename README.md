@@ -5,20 +5,20 @@
 > *(2) Do a web search on out-of-vocabulary words (just like a human would)*  
 > *(3) Parse N-grams (e.g. N = 5) for all text from top M websites (e.g. M = 50)*  
 > *(4) Filter known N-grams on large pre-trained corpus (e.g. word2vec, with 3 million N-grams)*  
-> *(5) Rank N-gram relevance by multiplying the inverse of global frequency in vocabulary corpus with local frequency on web sites (i.e. [TF-IDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf)*  
-> *(6) Sum the top V (e.g. V = 25) known N-grams, element-wise, to derive the new vector, i.e.*   
+> *(5) Rank N-grams: inverse global frequency in vocab x local frequency on M websites (i.e. [TF-IDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf))*  
+> *(6) Sum the top V (e.g. V = 25) N-grams, element-wise, to derive the new vector, i.e.*   
 
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/legel/words2map/master/visualizations/human_robot_cyborg.png" /></span></p>
 
-> *(7) Visualize quality of derivation by reducing dimensionality of all vectors to 2D / 3D (e.g [t-SNE](https://lvdmaaten.github.io/tsne/) was originally uesd, but now [UMAP](https://github.com/lmcinnes/umap) is recommended).
-> *(8) Finally, show clusters with [HDBSCAN](https://github.com/scikit-learn-contrib/hdbscan) and color-code them in a perceptually uniformly distributed space
+> *(7) Verify quality by dimensionality reduction to 2D or 3D (e.g [t-SNE](https://lvdmaaten.github.io/tsne/) works, but now [UMAP](https://github.com/lmcinnes/umap) is recommended)*  
+> *(8) Finally, show clusters with [HDBSCAN](https://github.com/scikit-learn-contrib/hdbscan) and color-code them in a perceptually uniformly distributed space*  
 
-> *In practice the derived vectors from autonomous real-time online research tend to be surprisingly good.  All of the following vectors were derived in this way:*  
+> *All of the following "word2maps" were derived a described above:*  
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/passions.png" /></span></p>
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/famous.png" /></span></p>
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/tech.png" /></span></p>
 
-> *See this [archived blog post](http://web.archive.org/web/20160806040004if_/http://blog.yhat.com/posts/words2map.html) for more details on the words2map algorithm.*
+> *See this [archived blog post](http://web.archive.org/web/20160806040004if_/http://blog.yhat.com/posts/words2map.html) for more details on the words2map algorithm.*  
 
 ### Derive new vectors for words by searching online
 
