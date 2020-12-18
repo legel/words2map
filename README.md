@@ -1,6 +1,6 @@
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/architecture.png" /></span></p>
  
-> *Deriving [OOV](https://medium.com/@shabeelkandi/handling-out-of-vocabulary-words-in-natural-language-processing-based-on-context-4bbba16214d5) deep vectors by searching online.*  
+> *Deriving [OOV](https://medium.com/@shabeelkandi/handling-out-of-vocabulary-words-in-natural-language-processing-based-on-context-4bbba16214d5) deep vectors by searching online:*  
 > *(1) Connect NLP vector database with a web search engine API like Google / Bing*  
 > *(2) Do a web search on out-of-vocabulary words (just like a human would)*  
 > *(3) Parse N-grams (e.g. N = 5) for all text from top M websites (e.g. M = 50)*  
