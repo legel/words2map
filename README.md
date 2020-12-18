@@ -1,11 +1,11 @@
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/architecture.png" /></span></p>
  
 > *Instantly derive [OOV](https://medium.com/@shabeelkandi/handling-out-of-vocabulary-words-in-natural-language-processing-based-on-context-4bbba16214d5) vectors by searching online.  
-> *Here is the algorithm:
+> *Here is the algorithm:*  
 > *(1) Hook up a vector-based NLP system with real-time OOV parsing requirements into a search engine API like Google / Bing*  
 > *(2) When out-of-vocabulary (OOV) words and phrases are encountered, automatically search for them on the web - just like a human would*  
-> *(3) Download and parse N-grams (e.g. N = 5) for all text from the top M websites (e.g. M = 50)
-> *(4) Filter all N-grams that are already known in an existing vector vocublary (e.g. word2vec corpus from Google in 2013 with 3 million N-grams) 
+> *(3) Download and parse N-grams (e.g. N = 5) for all text from the top M websites (e.g. M = 50)*  
+> *(4) Filter all N-grams that are already known in an existing vector vocublary (e.g. word2vec corpus from Google in 2013 with 3 million N-grams)*  
 > *(5) Weight and rank the important of all found N-grams by multiplying a metric of their global frequency in the vocabulary corpus, by a metric of local frequency (e.g. [TF-IDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf)*  
 > *(6) Sum the top T ranked vectors, with or without weighting.  In practice a simple element-wise sum without weighting can work well, i.e.*   
 
