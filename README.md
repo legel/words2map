@@ -10,13 +10,12 @@
 
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/legel/words2map/master/visualizations/human_robot_cyborg.png" /></span></p>
 
-> *(7) Verify quality by dimensionality reduction to 2D or 3D (e.g [t-SNE](https://lvdmaaten.github.io/tsne/) works, but now [UMAP](https://github.com/lmcinnes/umap) is recommended)*  
-> *(8) Finally, show clusters with [HDBSCAN](https://github.com/scikit-learn-contrib/hdbscan) and color-code them in a perceptually uniformly distributed space*  
+> *(7) Visualize quality by reducing dimensions to 2D or 3D (e.g [t-SNE](https://lvdmaaten.github.io/tsne/) works, but [UMAP](https://github.com/lmcinnes/umap) now recommended)*  
+> *(8) Finally, show clusters with [HDBSCAN](https://github.com/scikit-learn-contrib/hdbscan), color-coded in a perceptually uniform space*  
 
-> *All of the following "word2maps" were derived a described above:*  
+> *These "words2map" were all derived as explained above:*  
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/passions.png" /></span></p>
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/famous.png" /></span></p>
-<p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/tech.png" /></span></p>
 
 > *See this [archived blog post](http://web.archive.org/web/20160806040004if_/http://blog.yhat.com/posts/words2map.html) for more details on the words2map algorithm.*  
 
