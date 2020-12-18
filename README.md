@@ -13,7 +13,7 @@
 > *(7) Visualize by reducing dimensions to 2D/3D (e.g [t-SNE](https://lvdmaaten.github.io/tsne/) works, but [UMAP](https://github.com/lmcinnes/umap) recommended)*  
 > *(8) Finally, show clusters with [HDBSCAN](https://github.com/scikit-learn-contrib/hdbscan), color-coded in a perceptually uniform space*  
 
-> *These vector maps were derived online in a few seconds, on top of word2vec + Google, as explained above:*  
+> *These OOV vectors were derived in a few seconds as explained above:*  
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/passions.png" /></span></p>
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/famous.png" /></span></p>
 
