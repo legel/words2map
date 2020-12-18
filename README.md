@@ -4,9 +4,9 @@
 > *(1) Connect NLP vector database with a web search engine API like Google / Bing*  
 > *(2) Do a web search on out-of-vocabulary words (just like a human would)*  
 > *(3) Parse N-grams (e.g. N = 5) for all text from top M websites (e.g. M = 50)*  
-> *(4) Filter known N-grams on large pre-trained corpus (e.g. word2vec, with 3 million N-grams)*  
-> *(5) Rank N-grams: inverse global frequency in vocab x local frequency on M websites (i.e. [TF-IDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf))*  
-> *(6) Sum the top V (e.g. V = 25) N-grams, element-wise, to derive the new vector, i.e.*   
+> *(4) Filter known N-grams from pre-trained corpus (e.g. word2vec, with 3 million N-grams)*  
+> *(5) Rank N-grams: inverse global frequency x local frequency on M websites (i.e. [TF-IDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf))*  
+> *(6) Sum the top O (e.g. O = 25) N-grams, element-wise, to derive the new vector, i.e.*   
 
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/legel/words2map/master/visualizations/human_robot_cyborg.png" /></span></p>
 
