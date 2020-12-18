@@ -1,13 +1,12 @@
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/overlap-ai/words2map/master/visualizations/architecture.png" /></span></p>
  
-> *Instantly derive [OOV](https://medium.com/@shabeelkandi/handling-out-of-vocabulary-words-in-natural-language-processing-based-on-context-4bbba16214d5) vectors by searching online.  
-> *Here is the algorithm:*  
-> *(1) Hook up a vector-based NLP system with real-time OOV parsing requirements into a search engine API like Google / Bing*  
-> *(2) When out-of-vocabulary (OOV) words and phrases are encountered, automatically search for them on the web - just like a human would*  
-> *(3) Download and parse N-grams (e.g. N = 5) for all text from the top M websites (e.g. M = 50)*  
-> *(4) Filter all N-grams that are already known in an existing vector vocublary (e.g. word2vec corpus from Google in 2013 with 3 million N-grams)*  
-> *(5) Weight and rank the important of all found N-grams by multiplying a metric of their global frequency in the vocabulary corpus, by a metric of local frequency (e.g. [TF-IDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf)*  
-> *(6) Sum the top T ranked vectors, with or without weighting.  In practice a simple element-wise sum without weighting can work well, i.e.*   
+> *Deriving [OOV](https://medium.com/@shabeelkandi/handling-out-of-vocabulary-words-in-natural-language-processing-based-on-context-4bbba16214d5) deep vectors by searching online.*  
+> *(1) Connect NLP vector database with a web search engine API like Google / Bing*  
+> *(2) Do a web search on out-of-vocabulary words (just like a human would)*  
+> *(3) Parse N-grams (e.g. N = 5) for all text from top M websites (e.g. M = 50)*  
+> *(4) Filter known N-grams on large pre-trained corpus (e.g. word2vec, with 3 million N-grams)*  
+> *(5) Rank N-gram relevance by multiplying the inverse of global frequency in vocabulary corpus with local frequency on web sites (i.e. [TF-IDF](https://en.wikipedia.org/wiki/Tf%E2%80%93idf)*  
+> *(6) Sum the top V (e.g. V = 25) known N-grams, element-wise, to derive the new vector, i.e.*   
 
 <p style="text-align: center;"><span style="font-family:georgia,serif"><img alt="" src="https://raw.githubusercontent.com/legel/words2map/master/visualizations/human_robot_cyborg.png" /></span></p>
 
